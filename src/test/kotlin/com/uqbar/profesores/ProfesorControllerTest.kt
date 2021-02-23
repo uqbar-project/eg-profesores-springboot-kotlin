@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 class ProfesorControllerTest {
     private val ID_PROFESOR = 1L
     private val mapper = jacksonObjectMapper()
+
     @Autowired
     lateinit var mockMvc: MockMvc
 

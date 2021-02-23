@@ -1,13 +1,11 @@
 # Ejemplo Profesores y Materias
 
-[![Build Status](https://travis-ci.com/uqbar-project/eg-profesores-springboot.svg?branch=master)](https://travis-ci.com/uqbar-project/eg-profesores-springboot)
-
 ## Prerrequisitos
 
 - Necesitás instalar un motor de base de datos relacional (te recomendamos [MySQL](https://www.mysql.com/) que es OpenSource y gratuito)
 - En MySQL: hay que crear una base de datos facultad. No hay que correr los scripts, las tablas se recrean cada vez que se levanta la aplicación.
 
-``` sql
+```sql
 CREATE SCHEMA facultad;
 ```
 
@@ -36,7 +34,7 @@ Un profesor dicta una o varias materias, y a su vez cada materia es dictada por 
 
 ## Endpoint especial
 
-- GET | `./materias/{id}`: devuelve una materia, con sus profesores. 
+- `GET ./materias/{id}`: devuelve una materia, con sus profesores. 
 
 Una decisión de diseño importante que tomamos fue **no tener referencias bidireccionales** (de profesor a materias y de materia a profesores). El primer motivo es didático, el segundo es que mantener esa relación bidireccional tiene un costo y debemos decidir quién es el dueño de esa relación (para no entrar en loop al agregar un profesor a una materia, además del agregado en cada una de las colecciones). Pueden consultar [este post de Stack overflow](https://stackoverflow.com/questions/22461613/pros-and-cons-of-jpa-bidirectional-relationships) para más información.
 
@@ -71,57 +69,46 @@ Para ello vamos a necesitar dos pasos:
 
 1. Aprovechar que el modelo relacional nos permite hacer un JOIN partiendo de cualquiera de las entidades (tiene una navegación más flexible que el modelo de grafo de objetos). Haremos un query en [JPQL](https://es.wikipedia.org/wiki/Java_Persistence_Query_Language) (Java Persistence Query Language), una variante de SQL que trata de acercarse más al paradigma de objetos.
 
-```xtend
-	@Query("SELECT m.id as id, m.nombre as nombre, m.anio as anio, p.id as profesorId, p.nombreCompleto as profesorNombre FROM Profesor p INNER JOIN p.materias m WHERE m.id = :id")
-	def List<MateriaFullRowDTO> findFullById(Long id)
+```kotlin
+@Query("SELECT m.id as id, m.nombre as nombre, m.anio as anio, p.id as profesorId, p.nombreCompleto as profesorNombre FROM Profesor p INNER JOIN p.materias m WHERE m.id = :id")
+fun findFullById(id: Long): List<MateriaFullRowDTO>
 ```
 
 El resultado de esa consulta son n registros, porque es el producto cartesiano de 1 materia con n profesores.
 
 El DTO es una interfaz, donde por convención los atributos se corresponden con el alias que le pusimos en el query:
 
-```xtend
-@Data
-class MateriaDTO {
-	Long id
-	String nombre
-	int anio
-	List<ProfesorDTO> profesores
-}
+```kotlin
+data class MateriaDTO(val id: Long, val nombre: String, val anio: Int, val profesores: List<ProfesorDTO>)
 ```
 
 Podemos mapear el atributo de nuestro DTO con otro nombre, mediante la anotación `@Value`:
 
-```xtend
+```kotlin
 interface MateriaFullRowDTO {
-  def Long getId()
-  @Value("#{target.nombre}") // el formato es "target".{atributo del query}
-  def String getNombreLindo()
-  ...
+    fun getId(): Long
+    @Value("#{target.nombre}") // el formato es "target".{atributo del query}
+    fun getNombreLindo(): String
+    ...
 }
 ```
 
 2. Como queremos que el endpoint devuelva una sola entidad materia, vamos a agrupar todos los profesores en una lista, y tomaremos la información de la materia una sola vez (porque sabemos que las otras filas simplemente repiten el dato):
 
-```xtend
-@GetMapping(value="/materias/{id}")
-def getMateria(@PathVariable Long id) {
+```kotlin
+@GetMapping("/materias/{id}")
+@ApiOperation("Devuelve una materia, con sus profesores")
+fun getMateria(@PathVariable id: Long): ResponseEntity<MateriaDTO> {
+    // Recibimos n registros de materias
+    val materiasDTO = materiaRepository.findFullById(id)
+    if (materiasDTO.isEmpty()) {
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, "La materia con identificador $id no existe")
+    }
 
-  // Recibimos n registros de materias
-  val materiasDTO = this
-    .materiaRepository
-    .findFullById(id)
-    
-  if (materiasDTO.empty) {
-    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La materia con identificador " + id + " no existe")
-  }
-  
-  // Agrupamos los profesores de la materia
-  val materia = materiasDTO.head
-  val profesores = materiasDTO.map [ materiaDTO |
-    new ProfesorDTO(materiaDTO.profesorId, materiaDTO.profesorNombre) 
-  ]
-  new MateriaDTO(materia.id, materia.nombreLindo, materia.anio, profesores)
+    // Agrupamos los profesores de la materia
+    val materia = materiasDTO.first()
+    val profesores = materiasDTO.map { ProfesorDTO(it.getProfesorId(), it.getProfesorNombre()) }
+    return ResponseEntity.ok().body(MateriaDTO(materia.getId(), materia.getNombreLindo(), materia.getAnio(), profesores))
 }
 ```
 
@@ -138,22 +125,22 @@ En este caso nos vamos a concentrar más en los segundos tipos de tests, princip
 
 Veamos entonces cómo Springboot nos ayuda a construir un entorno de testing que comienza en el endpoint (el Controller), pasa al repositorio y se apoya en los objetos de dominio:
 
-```xtend
-	@Test
-	@DisplayName("podemos consultar todos los profesores")
-	def void profesoresHappyPath() {
-		val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores")).andReturn.response
-		val profesores = responseEntity.contentAsString.fromJsonToList(Profesor)
-		assertEquals(200, responseEntity.status)
-		assertEquals(3, profesores.size)
-		// los profesores no traen las materias
-		assertEquals(0, profesores.head.materias.size)
-	}
+```kotlin
+@Test
+@DisplayName("podemos consultar todos los profesores")
+fun profesoresHappyPath() {
+    val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores")).andReturn().response
+    val profesores = mapper.readValue<List<Profesor>>(responseEntity.contentAsString)
+    assertEquals(200, responseEntity.status)
+    assertEquals(3, profesores.size)
+    // los profesores no traen las materias
+    assertEquals(0, profesores.first().materias.size)
+}
 ```
 
 El mismo mecanismo de bootstrap que crea los profesores para levantar la aplicación es el que estamos utilizando en los tests, solo que en lugar de trabajar con una base de datos real estaremos usando una base relacional en memoria, H2. Esto se configura en la clase de test:
 
-```xtend
+```kotlin
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -194,32 +181,32 @@ Para más información recomendamos leer [el artículo de Springboot de Baeldung
 
 En este test queremos traer el dato de un profesor:
 
-```xtend
-	@Test
-	@DisplayName("al traer el dato de un profesor trae las materias en las que participa")
-	def void profesorExistenteConMaterias() {
-		val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/" + ID_PROFESOR)).andReturn.response
-		assertEquals(200, responseEntity.status)
-		val profesor = responseEntity.contentAsString.fromJson(Profesor)
-		assertEquals(2, profesor.materias.size)
-	}
+```kotlin
+@Test
+@DisplayName("al traer el dato de un profesor trae las materias en las que participa")
+fun profesorExistenteConMaterias() {
+    val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/$ID_PROFESOR")).andReturn().response
+    assertEquals(200, responseEntity.status)
+    val profesor = mapper.readValue<Profesor>(responseEntity.contentAsString)
+    assertEquals(2, profesor.materias.size)
+}
 ```
 
-Para ello definimos el identificador del profesor como el número 1, de tipo long (por eso el sufijo `L`):
+Para ello definimos el identificador del profesor como el número 1, de tipo Long (por eso el sufijo `L`):
 
-```xtend
-	static val ID_PROFESOR = 1L
+```kotlin
+private val ID_PROFESOR = 1L
 ```
 
 Para estar seguros de que el identificador 1 existe, el atributo `id` de la entidad Profesor tiene que apuntar a una secuencia autoincremental que sea exclusiva de la tabla de profesores, esto se hace de la siguiente manera:
 
-```xtend
+```kotlin
 	@Id
 	// El GenerationType asociado a la TABLE es importante para tener
 	// una secuencia de identificadores única para los profesores
 	// (para que no dependa de otras entidades anteriormente creadas)
 	@GeneratedValue(strategy = GenerationType.TABLE)
-	Long id
+	var id: Long = 0
 ```
 
 Es importante tener el control del identificador que se genera porque es nuestro punto de entrada para hacer el pedido get al controller. Luego validamos que
@@ -236,23 +223,23 @@ Por último, tenemos un test de integración que va a producir un efecto colater
 - hacer la llamada GET verificando que el efecto se persitió (comparando con el valor que tenía antes del cambio)
 - y por último, desharemos el cambio manualmente para eliminar la dependencia entre tests (de lo contrario el orden en el que evaluemos los casos de prueba pueden ser exitosos o fallidos, lo que se conoce como [_flaky test_](https://engineering.atspotify.com/2019/11/18/test-flakiness-methods-for-identifying-and-dealing-with-flaky-tests/))
 
-```xtend
-	@Test
-	@DisplayName("podemos actualizar la información de un profesor")
-	def void actualizarProfesor() {
-		val profesor = getProfesor(ID_PROFESOR)
-		val materias = repoMaterias.findByNombre("Diseño de Sistemas")
-		assertEquals(1, materias.size)
-		val materiaNueva = materias.head
-		profesor.agregarMateria(materiaNueva)
-		updateProfesor(ID_PROFESOR, profesor)
-		val nuevoProfesor = getProfesor(ID_PROFESOR)
-		val materiasDelProfesor = profesor.materias.size
-		assertEquals(materiasDelProfesor, nuevoProfesor.materias.size)
-		// Pero ojo, como esto tiene efecto colateral, vamos a volver atrás el cambio
-		profesor.quitarMateria(materiaNueva)
-		updateProfesor(ID_PROFESOR, profesor)
-	}
+```kotlin
+@Test
+@DisplayName("podemos actualizar la información de un profesor")
+fun actualizarProfesor() {
+    val profesor = getProfesor(ID_PROFESOR)
+    val materias = repoMaterias.findByNombre("Diseño de Sistemas")
+    assertEquals(1, materias.size)
+    val materiaNueva = materias.first()
+    profesor.agregarMateria(materiaNueva)
+    updateProfesor(ID_PROFESOR, profesor)
+    val nuevoProfesor = getProfesor(ID_PROFESOR)
+    val materiasDelProfesor = profesor.materias.size
+    assertEquals(materiasDelProfesor, nuevoProfesor.materias.size)
+    // Pero ojo, como esto tiene efecto colateral, vamos a volver atrás el cambio
+    profesor.quitarMateria(materiaNueva)
+    updateProfesor(ID_PROFESOR, profesor)
+}
 ```
 
 ## Material adicional
