@@ -205,12 +205,12 @@ private val ID_PROFESOR = 1L
 Para estar seguros de que el identificador 1 existe, el atributo `id` de la entidad Profesor tiene que apuntar a una secuencia autoincremental que sea exclusiva de la tabla de profesores, esto se hace de la siguiente manera:
 
 ```kotlin
-	@Id
-	// El GenerationType asociado a la TABLE es importante para tener
-	// una secuencia de identificadores única para los profesores
-	// (para que no dependa de otras entidades anteriormente creadas)
-	@GeneratedValue(strategy = GenerationType.TABLE)
-	var id: Long = 0
+@Id
+// El GenerationType asociado a la TABLE es importante para tener
+// una secuencia de identificadores única para los profesores
+// (para que no dependa de otras entidades anteriormente creadas)
+@GeneratedValue(strategy = GenerationType.TABLE)
+var id: Long = 0
 ```
 
 Es importante tener el control del identificador que se genera porque es nuestro punto de entrada para hacer el pedido get al controller. Luego validamos que
