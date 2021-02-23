@@ -25,6 +25,10 @@ Un profesor dicta una o varias materias, y a su vez cada materia es dictada por 
 - el modelo de objetos, donde simplemente tenemos una colección de materias en profesor (y podríamos tener eventualmente una colección de profesores en materia)
 - el modelo relacional, que requiere una entidad que relacione profesor y materia mediante claves foráneas que referencien a sus identificadores. Esto no necesita de una entidad extra en el modelo de objetos porque de esa relación no nacen atributos (aunque podrían, si quisiéramos guardar por ejemplo la fecha en la que el profesor comenzó a dar la materia)
 
+## Swagger / Open-API
+
+http://localhost:8080/swagger-ui/index.html
+
 ## Endpoints comunes
 
 - `GET ./profesores/`: devuelve la lista de profesores, sin las materias
