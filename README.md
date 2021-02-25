@@ -1,5 +1,7 @@
 # Ejemplo Profesores y Materias
 
+[![Build Status](https://travis-ci.com/uqbar-project/eg-profesores-springboot-kotlin.svg?branch=master)](https://travis-ci.com/uqbar-project/eg-profesores-springboot-kotlin) [![codecov](https://codecov.io/gh/uqbar-project/eg-profesores-springboot-kotlin/branch/master/graph/badge.svg?token=GVSN9QQUQZ)](https://codecov.io/gh/uqbar-project/eg-profesores-springboot-kotlin)
+
 ## Prerrequisitos
 
 - Necesitás instalar un motor de base de datos relacional (te recomendamos [MySQL](https://www.mysql.com/) que es OpenSource y gratuito)
@@ -27,7 +29,11 @@ Un profesor dicta una o varias materias, y a su vez cada materia es dictada por 
 
 ## Swagger / Open-API
 
-http://localhost:8080/swagger-ui/index.html
+El proyecto viene con las dependencias de Swagger2 por lo tanto podés testearlo directamente en el navegador cuando levantes la aplicación en la siguiente URL:
+
+```url
+http://localhost:8080/swagger-ui/index.html#
+```
 
 ## Endpoints comunes
 
