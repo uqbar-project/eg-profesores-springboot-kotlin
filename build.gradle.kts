@@ -5,11 +5,14 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	kotlin("jvm") version "1.4.30"
 	kotlin("plugin.spring") version "1.4.30"
+	kotlin("plugin.jpa") version "1.4.30"
+	jacoco
 }
 
 group = "com.uqbar"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_14
+java.targetCompatibility = JavaVersion.VERSION_14
 
 repositories {
 	mavenCentral()
@@ -32,10 +35,30 @@ dependencies {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "11"
+		jvmTarget = "14"
 	}
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test) // tests are required to run before generating the report
+}
+
+jacoco {
+	toolVersion = "0.8.5"
+}
+
+tasks.jacocoTestReport {
+	reports {
+		xml.isEnabled = true
+		csv.isEnabled = false
+		html.isEnabled = false
+	}
 }
