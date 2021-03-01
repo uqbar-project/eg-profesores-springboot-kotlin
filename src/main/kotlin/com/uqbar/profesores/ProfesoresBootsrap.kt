@@ -2,10 +2,14 @@ package com.uqbar.profesores
 
 import com.uqbar.profesores.domain.Materia
 import com.uqbar.profesores.domain.Profesor
+import com.uqbar.profesores.domain.Rol
+import com.uqbar.profesores.domain.Usuario
 import com.uqbar.profesores.repos.MateriaRepository
 import com.uqbar.profesores.repos.ProfesorRepository
+import com.uqbar.profesores.repos.UserRepository
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 /**
@@ -20,6 +24,12 @@ class ProfesoresBootstrap : InitializingBean {
 
     @Autowired
     lateinit var repoProfes : ProfesorRepository
+
+    @Autowired
+    lateinit var repoUsuarios : UserRepository
+
+    @Autowired
+    lateinit var bcryptEncoder: BCryptPasswordEncoder
 
     override fun afterPropertiesSet() {
         println("************************************************************************")
@@ -51,5 +61,14 @@ class ProfesoresBootstrap : InitializingBean {
         repoProfes.save(spigariol)
         repoProfes.save(passerini)
         repoProfes.save(dodino)
+
+        val profesorRol = Rol("PROFESOR", "Rol de profesor")
+        val alumnoRol = Rol("ALUMNO", "Rol de alumno")
+
+        val profesor = Usuario("profesor", bcryptEncoder.encode("password"), setOf(profesorRol, alumnoRol))
+        val alumno = Usuario("alumno", bcryptEncoder.encode("password"), setOf(alumnoRol))
+
+        repoUsuarios.save(profesor)
+        repoUsuarios.save(alumno)
     }
 }

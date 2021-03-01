@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
@@ -28,6 +29,7 @@ class ProfesorController {
         }
 
     @PutMapping("/profesores/{id}")
+    @PreAuthorize("hasRole('PROFESOR')")
     @ApiOperation("Actualiza un profesor")
     fun actualizarCandidato(@RequestBody profesorNuevo: Profesor, @PathVariable id: Long): ResponseEntity<String> {
         profesorRepository.findById(id).map {

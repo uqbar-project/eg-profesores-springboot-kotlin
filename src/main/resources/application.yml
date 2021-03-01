@@ -3,7 +3,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost/facultad
     username: root
-    password:
+    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -17,11 +17,3 @@ spring:
     error:
       include-message: always
       include-binding-errors: always
-
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: 424954857851-18ldusgnp3u3uh38s4d70bmhlq6o2n5j.apps.googleusercontent.com
-            client-secret: oUFxl7uS_D1La_SOQ8B-udLQ
