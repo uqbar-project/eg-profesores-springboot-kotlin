@@ -2,14 +2,21 @@ package com.uqbar.profesores.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import java.util.HashSet
 import javax.persistence.*
 
 @Entity
-class Usuario(@Column var username: String? = null, @Column @JsonIgnore var password: String? = null,
-              @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-              @JoinTable(name = "USER_ROLES", joinColumns = [JoinColumn(name = "USER_ID")], inverseJoinColumns = [JoinColumn(name = "ROLE_ID")])
-              var roles: Set<Rol>? = null) {
+class Usuario(@Column var username: String? = null, @Column @JsonIgnore var password: String? = null) {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0
+
+    constructor() : this("", "")
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    var roles: MutableSet<Rol> = HashSet()
+
+    fun agregarRol(rol: Rol) {
+        roles.add(rol)
+    }
 }

@@ -10,6 +10,7 @@ class Materia(@Column var nombre: String = "", @Column var anio: Int = 0) {
 
     // Hibernate necesita un constructor sin argumentos
     // si creás un constructor con parámetros debés agregar uno sin ninguno
+    constructor() : this("", 0)
 
     override fun toString() = "$nombre ($anio)"
 }

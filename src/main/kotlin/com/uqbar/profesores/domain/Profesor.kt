@@ -16,6 +16,7 @@ class Profesor(@Column var nombreCompleto: String = "") {
 
     // Hibernate necesita un constructor sin argumentos
     // si creás un constructor con parámetros debés agregar uno sin ninguno
+    constructor() : this("")
 
     fun agregarMateria(materia: Materia) {
         materias.add(materia)

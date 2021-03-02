@@ -19,7 +19,7 @@ import javax.annotation.Resource
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-abstract class WebSecurityConfig : WebSecurityConfigurerAdapter() {
+class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Resource(name = "userService")
     lateinit var userDetailsService: UserDetailsService
 
@@ -28,7 +28,9 @@ abstract class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Bean
     @Throws(Exception::class)
-    override fun authenticationManagerBean(): AuthenticationManager = super.authenticationManagerBean()
+    override fun authenticationManagerBean(): AuthenticationManager {
+        return super.authenticationManagerBean()
+    }
 
     @Autowired
     @Throws(Exception::class)
@@ -38,7 +40,9 @@ abstract class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Bean
     @Throws(Exception::class)
-    fun authenticationTokenFilterBean(): JwtAuthenticationFilter = JwtAuthenticationFilter()
+    fun authenticationTokenFilterBean(): JwtAuthenticationFilter {
+        return JwtAuthenticationFilter()
+    }
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
@@ -53,5 +57,7 @@ abstract class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     }
 
     @Bean
-    fun encoder(): BCryptPasswordEncoder = BCryptPasswordEncoder()
+    fun encoder(): BCryptPasswordEncoder {
+        return BCryptPasswordEncoder()
+    }
 }

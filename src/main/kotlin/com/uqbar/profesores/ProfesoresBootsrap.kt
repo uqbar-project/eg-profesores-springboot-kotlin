@@ -6,6 +6,7 @@ import com.uqbar.profesores.domain.Rol
 import com.uqbar.profesores.domain.Usuario
 import com.uqbar.profesores.repos.MateriaRepository
 import com.uqbar.profesores.repos.ProfesorRepository
+import com.uqbar.profesores.repos.RolRepository
 import com.uqbar.profesores.repos.UserRepository
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,10 +27,10 @@ class ProfesoresBootstrap : InitializingBean {
     lateinit var repoProfes : ProfesorRepository
 
     @Autowired
-    lateinit var repoUsuarios : UserRepository
+    lateinit var repoRoles : RolRepository
 
     @Autowired
-    lateinit var bcryptEncoder: BCryptPasswordEncoder
+    lateinit var repoUsuarios : UserRepository
 
     override fun afterPropertiesSet() {
         println("************************************************************************")
@@ -65,8 +66,15 @@ class ProfesoresBootstrap : InitializingBean {
         val profesorRol = Rol("PROFESOR", "Rol de profesor")
         val alumnoRol = Rol("ALUMNO", "Rol de alumno")
 
-        val profesor = Usuario("profesor", bcryptEncoder.encode("password"), setOf(profesorRol, alumnoRol))
-        val alumno = Usuario("alumno", bcryptEncoder.encode("password"), setOf(alumnoRol))
+        repoRoles.save(profesorRol)
+        repoRoles.save(alumnoRol)
+
+        val profesor = Usuario("profesor", "\$2y\$12\$LB.L0Fc.UM9wwAMDiASHmOWqyb8sGICEIPCj0TDMu7buaNR4eYtCi ")
+        val alumno = Usuario("alumno", "\$2y\$12\$LB.L0Fc.UM9wwAMDiASHmOWqyb8sGICEIPCj0TDMu7buaNR4eYtCi ")
+
+        profesor.agregarRol(profesorRol)
+        profesor.agregarRol(alumnoRol)
+        alumno.agregarRol(alumnoRol)
 
         repoUsuarios.save(profesor)
         repoUsuarios.save(alumno)

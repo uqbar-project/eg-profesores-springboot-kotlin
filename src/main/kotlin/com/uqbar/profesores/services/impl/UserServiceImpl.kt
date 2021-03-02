@@ -34,7 +34,7 @@ class UserServiceImpl : UserDetailsService, UserService {
 
     private fun getAuthority(usuario: Usuario): Set<SimpleGrantedAuthority> {
         val authorities: MutableSet<SimpleGrantedAuthority> = HashSet()
-        usuario.roles?.forEach { role -> authorities.add(SimpleGrantedAuthority("ROLE_" + role.name)) }
+        usuario.roles.forEach { role -> authorities.add(SimpleGrantedAuthority("ROLE_" + role.name)) }
         return authorities
     }
 
