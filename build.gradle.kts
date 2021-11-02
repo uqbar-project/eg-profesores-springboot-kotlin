@@ -44,21 +44,34 @@ tasks.withType<Test> {
 }
 
 tasks.test {
-	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+	finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
-	dependsOn(tasks.test) // tests are required to run before generating the report
+	dependsOn(tasks.test)
 }
 
 jacoco {
-	toolVersion = "0.8.5"
+	toolVersion = "0.8.7"
 }
 
 tasks.jacocoTestReport {
+	classDirectories.setFrom(
+		files(classDirectories.files.map {
+			fileTree(it) {
+				exclude("**/config/**", "**/entity/**", "**/*Application*.*", "**/ServletInitializer.*")
+			}
+		})
+	)
 	reports {
-		xml.isEnabled = true
-		csv.isEnabled = false
-		html.isEnabled = false
+		xml.required.set(true)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
 	}
+}
+
+tasks.register("runOnGitHub") {
+	dependsOn("jacocoTestReport")
+	group = "custom"
+	description = "$ ./gradlew runOnGitHub # runs on GitHub Action"
 }
