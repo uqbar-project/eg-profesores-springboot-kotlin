@@ -18,7 +18,7 @@ class MateriaController {
 
     @GetMapping("/materias")
     @ApiOperation("Devuelve todas las materias")
-    fun getZonas() = materiaRepository.findAll()
+    fun getMaterias() = materiaRepository.findAll()
 
     @GetMapping("/materias/{id}")
     @ApiOperation("Devuelve una materia, con sus profesores")
