@@ -21,19 +21,5 @@ class Profesor(@Column var nombreCompleto: String = "") {
         materias.add(materia)
     }
 
-    fun quitarMateria(materia: Materia) {
-        materias.remove(materia)
-    }
-
-    fun clearMaterias() {
-        materias.clear()
-    }
-
-    fun dicta(materia: Materia): Boolean = materias.contains(materia)
-
     override fun toString() = "$nombreCompleto ($id)"
-
-    override fun equals(other: Any?) = id == (other as Profesor).id
-
-    override fun hashCode() = id.hashCode()
 }
