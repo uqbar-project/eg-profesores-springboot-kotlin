@@ -29,7 +29,7 @@ class ProfesorController {
 
     @PutMapping("/profesores/{id}")
     @ApiOperation("Actualiza un profesor")
-    fun actualizarCandidato(@RequestBody profesorNuevo: Profesor, @PathVariable id: Long): ResponseEntity<String> {
+    fun actualizarProfesor(@RequestBody profesorNuevo: Profesor, @PathVariable id: Long): ResponseEntity<String> {
         profesorRepository.findById(id).map {
             it.nombreCompleto = profesorNuevo.nombreCompleto
             it.materias = profesorNuevo.materias

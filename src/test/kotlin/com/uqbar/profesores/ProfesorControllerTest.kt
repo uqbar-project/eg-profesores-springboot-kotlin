@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,9 +35,10 @@ class ProfesorControllerTest {
     lateinit var repoMaterias: MateriaRepository
 
     @Test
-    @DisplayName("podemos consultar todos los profesores")
-    fun profesoresHappyPath() {
-        val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores")).andReturn().response
+    fun `podemos consultar todos los profesores`() {
+        val responseEntity = mockMvc
+            .perform(MockMvcRequestBuilders.get("/profesores"))
+            .andReturn().response
         val profesores = mapper.readValue<List<Profesor>>(responseEntity.contentAsString)
         assertEquals(200, responseEntity.status)
         assertEquals(3, profesores.size)
@@ -44,8 +47,7 @@ class ProfesorControllerTest {
     }
 
     @Test
-    @DisplayName("al traer el dato de un profesor trae las materias en las que participa")
-    fun profesorExistenteConMaterias() {
+    fun `al traer el dato de un profesor trae las materias en las que participa`() {
         val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/$ID_PROFESOR")).andReturn().response
         assertEquals(200, responseEntity.status)
         val profesor = mapper.readValue<Profesor>(responseEntity.contentAsString)
@@ -53,15 +55,14 @@ class ProfesorControllerTest {
     }
 
     @Test
-    @DisplayName("no podemos traer información de un profesor inexistente")
-    fun profesorInexistente() {
-        val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/100")).andReturn().response
-        assertEquals(404, responseEntity.status)
+    fun `no podemos traer informacion de un profesor inexistente`() {
+        mockMvc.perform(MockMvcRequestBuilders.get("/profesores/100"))
+            .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
     @Test
-    @DisplayName("podemos actualizar la información de un profesor")
-    fun actualizarProfesor() {
+    @Transactional
+    fun `podemos actualizar la informacion de un profesor`() {
         val profesor = getProfesor(ID_PROFESOR)
         val materias = repoMaterias.findByNombre("Diseño de Sistemas")
         assertEquals(1, materias.size)
@@ -71,16 +72,26 @@ class ProfesorControllerTest {
         val nuevoProfesor = getProfesor(ID_PROFESOR)
         val materiasDelProfesor = profesor.materias.size
         assertEquals(materiasDelProfesor, nuevoProfesor.materias.size)
-        // Pero ojo, como esto tiene efecto colateral, vamos a volver atrás el cambio
-        profesor.quitarMateria(materiaNueva)
-        updateProfesor(ID_PROFESOR, profesor)
+    }
+
+    @Test
+    fun `no podemos actualizar un profesor inexistente`() {
+        val profesorBody = mapper.writeValueAsString(Profesor().apply {
+            nombreCompleto = "Juan Contardo"
+            id = 100
+        })
+        mockMvc.perform(MockMvcRequestBuilders.put("/profesores/100")
+            .contentType("application/json")
+            .content(profesorBody)
+        ).andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
     private fun updateProfesor(idProfesor: Long, profesor: Profesor) {
         val profesorBody = mapper.writeValueAsString(profesor)
-        val responseEntityPut = mockMvc.perform(
-            MockMvcRequestBuilders.put("/profesores/$idProfesor").contentType("application/json").content(profesorBody)).andReturn().response
-        assertEquals(200, responseEntityPut.status, "Error al actualizar los profesores " + responseEntityPut.errorMessage)
+        mockMvc.perform(MockMvcRequestBuilders.put("/profesores/$idProfesor")
+                .contentType("application/json")
+                .content(profesorBody)
+        ).andExpect(MockMvcResultMatchers.status().isOk)
     }
 
     private fun getProfesor(idProfesor: Long): Profesor =

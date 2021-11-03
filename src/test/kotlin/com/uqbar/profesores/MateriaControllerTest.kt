@@ -1,6 +1,7 @@
 package com.uqbar.profesores
 
 import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider
+import com.uqbar.profesores.repos.MateriaRepository
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,9 @@ class MateriaControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
+    @Autowired
+    lateinit var repoMaterias: MateriaRepository
+
     @Test
     fun `obtener todas las materias`() {
         mockMvc.perform(MockMvcRequestBuilders.get("/materias"))
@@ -33,5 +37,15 @@ class MateriaControllerTest {
     fun `al buscar la informacion de una materia que no existe recibimos como respuesta un codigo de http 404`() {
         mockMvc.perform(MockMvcRequestBuilders.get("/materias/12424"))
             .andExpect(MockMvcResultMatchers.status().isNotFound)
+    }
+
+    @Test
+    fun `al buscar la informacion de una materia correcta recibimos la agrupacion de profesores que la dan`() {
+        val materia = repoMaterias.findAll().first()
+        mockMvc.perform(MockMvcRequestBuilders.get("/materias/${materia.id}"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nombre").value(materia.nombre))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.anio").value(materia.anio))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.profesores").isArray)
     }
 }
