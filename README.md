@@ -1,6 +1,6 @@
 # Ejemplo Profesores y Materias
 
-[![Build Status](https://travis-ci.com/uqbar-project/eg-profesores-springboot-kotlin.svg?branch=master)](https://travis-ci.com/uqbar-project/eg-profesores-springboot-kotlin) [![codecov](https://codecov.io/gh/uqbar-project/eg-profesores-springboot-kotlin/branch/master/graph/badge.svg?token=GVSN9QQUQZ)](https://codecov.io/gh/uqbar-project/eg-profesores-springboot-kotlin)
+[![build](https://github.com/uqbar-project/eg-profesores-springboot-kotlin/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-profesores-springboot-kotlin/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/uqbar-project/eg-profesores-springboot-kotlin/branch/master/graph/badge.svg?token=GVSN9QQUQZ)](https://codecov.io/gh/uqbar-project/eg-profesores-springboot-kotlin)
 
 ## Prerrequisitos
 
