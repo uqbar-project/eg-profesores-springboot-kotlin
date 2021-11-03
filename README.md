@@ -42,6 +42,8 @@ http://localhost:8080/swagger-ui/index.html#
 - `GET ./materias/`: devuelve la lista de materias
 - `PUT ./profesores/{id}`: actualiza un profesor con los datos del body
 
+Se puede importar el archivo [Insomnia_Profesores.json](Insomnia_Profesores.json) en Insomnia, para tenerlos a mano.
+
 ## Endpoint especial
 
 - `GET ./materias/{id}`: devuelve una materia, con sus profesores. 
