@@ -1,6 +1,4 @@
 spring:
-  database: H2
-
   h2:
     console:
       enabled: true

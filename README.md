@@ -108,19 +108,18 @@ interface MateriaFullRowDTO {
 2. Como queremos que el endpoint devuelva una sola entidad materia, vamos a agrupar todos los profesores en una lista, y tomaremos la información de la materia una sola vez (porque sabemos que las otras filas simplemente repiten el dato):
 
 ```kotlin
-@GetMapping("/materias/{id}")
-@ApiOperation("Devuelve una materia, con sus profesores")
-fun getMateria(@PathVariable id: Long): ResponseEntity<MateriaDTO> {
+@Transactional(readOnly = true)
+fun getMateria(id: Long): MateriaDTO {
     // Recibimos n registros de materias
     val materiasDTO = materiaRepository.findFullById(id)
     if (materiasDTO.isEmpty()) {
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "La materia con identificador $id no existe")
+        throw NotFoundException("La materia con identificador $id no existe")
     }
 
     // Agrupamos los profesores de la materia
     val materia = materiasDTO.first()
     val profesores = materiasDTO.map { ProfesorDTO(it.getProfesorId(), it.getProfesorNombre()) }
-    return ResponseEntity.ok().body(MateriaDTO(materia.getId(), materia.getNombreLindo(), materia.getAnio(), profesores))
+    return MateriaDTO(materia.getId(), materia.getNombreLindo(), materia.getAnio(), profesores)
 }
 ```
 
@@ -164,17 +163,16 @@ La anotación ActiveProfiles que contiene el valor `test` por convención nos pe
 
 ```yml
 spring:
-    database: H2
-    h2:
-        console:
-            enabled: true
-            path: /h2
-    datasource:
-        url: jdbc:h2:mem:test
-        username: sa
-        password: sa
-        driver-class-name: org.h2.Driver
-    ...
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
 ```
 
 En general el nombre es `application-XXX.yml` donde XXX será el valor que le pasaremos a la anotación ActiveProfiles.
@@ -226,6 +224,11 @@ Es importante tener el control del identificador que se genera porque es nuestro
 - nos devuelva un código http 200
 - y que además la información del profesor contenga las materias que da ese docente
 
+**Variantes**:
+
+- al crear el profesor, quedarme con el ID (es una forma mucho más segura de garantizar que apuntamos al profesor correcto)
+- en lugar de utilizar el **mapper**, podemos hacer búsquedas por JsonPath, como pueden ver en los tests de Materia.
+
 ### Test de actualización
 
 Por último, tenemos un test de integración que va a producir un efecto colateral. En este caso vamos a
@@ -233,12 +236,12 @@ Por último, tenemos un test de integración que va a producir un efecto colater
 - tomar la información de un profesor
 - producir un efecto (dictará una materia nueva) y persistir ese efecto haciendo una llamada http PUT
 - hacer la llamada GET verificando que el efecto se persitió (comparando con el valor que tenía antes del cambio)
-- y por último, desharemos el cambio manualmente para eliminar la dependencia entre tests (de lo contrario el orden en el que evaluemos los casos de prueba pueden ser exitosos o fallidos, lo que se conoce como [_flaky test_](https://engineering.atspotify.com/2019/11/18/test-flakiness-methods-for-identifying-and-dealing-with-flaky-tests/))
+- y por último, se deshace el cambio mediante la anotación `@Transactional` sobre el test
 
 ```kotlin
 @Test
-@DisplayName("podemos actualizar la información de un profesor")
-fun actualizarProfesor() {
+@Transactional
+fun `podemos actualizar la informacion de un profesor`() {
     val profesor = getProfesor(ID_PROFESOR)
     val materias = repoMaterias.findByNombre("Diseño de Sistemas")
     assertEquals(1, materias.size)
@@ -248,9 +251,6 @@ fun actualizarProfesor() {
     val nuevoProfesor = getProfesor(ID_PROFESOR)
     val materiasDelProfesor = profesor.materias.size
     assertEquals(materiasDelProfesor, nuevoProfesor.materias.size)
-    // Pero ojo, como esto tiene efecto colateral, vamos a volver atrás el cambio
-    profesor.quitarMateria(materiaNueva)
-    updateProfesor(ID_PROFESOR, profesor)
 }
 ```
 
