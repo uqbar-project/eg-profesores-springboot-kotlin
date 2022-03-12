@@ -1,7 +1,7 @@
 spring:
   #   base de datos posta
   datasource:
-    url: jdbc:mysql://localhost/facultad
+    url: jdbc:mysql://localhost/facultad?createDatabaseIfNotExist=true
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver

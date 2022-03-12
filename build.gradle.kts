@@ -31,9 +31,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.6")
 	implementation("org.springframework.boot:spring-boot-devtools:$springVersion")
-	runtimeOnly("com.h2database:h2")
-	runtimeOnly("mysql:mysql-connector-java")
+	testImplementation("com.h2database:h2:2.1.210")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
+	runtimeOnly("mysql:mysql-connector-java:8.0.28")
 }
 
 tasks.withType<KotlinCompile> {
