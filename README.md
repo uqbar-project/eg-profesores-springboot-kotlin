@@ -5,19 +5,13 @@
 ## Prerrequisitos
 
 - Necesitás instalar un motor de base de datos relacional (te recomendamos [MySQL](https://www.mysql.com/) que es OpenSource y gratuito)
-- En MySQL: hay que crear una base de datos facultad. No hay que correr los scripts, las tablas se recrean cada vez que se levanta la aplicación.
-
-```sql
-CREATE SCHEMA facultad;
-```
-
 - Revisá la password para conectarte a la base en el archivo [`application.yml`](./src/main/resources/application.yml):
 
 ```yml
     datasource:
-        url: jdbc:mysql://localhost/facultad
-        username: root
-        password:   # acá podés dejarla en blanco si no tenés contraseña o escribir la tuya
+      url: jdbc:mysql://localhost/facultad?createDatabaseIfNotExist=true
+      username: root
+      password:   # acá podés dejarla en blanco si no tenés contraseña o escribir la tuya
 ```
 
 ## Objetivo
@@ -128,7 +122,7 @@ fun getMateria(id: Long): MateriaDTO {
 Como cuenta [este artículo](https://www.testim.io/blog/unit-test-vs-integration-test/), tenemos que tomar una decisión de diseño sobre cómo testear este componente que creamos. Sabemos que
 
 - los tests unitarios prueban una unidad funcional, no trabajan con la base de datos ni con la red, como consecuencia **son más rápidos de ejecutar y más fáciles para generar y mantener**. Como contrapartida, necesitan mecanismos para simular efectos, operaciones costosas o donde interviene el azar, y es importante entender que eso reduce la eficacia para encontrar problemas.
-- por otra parte, los tests de integración son bastante más costosos de elaborar, porque están probando la integración de varios componentes de nuestra arquitectura.
+- por otra parte, los tests de integración requieren un mayor esfuerzo de desarrollo, porque están probando la integración de varios componentes de nuestra arquitectura.
 
 En este caso nos vamos a concentrar más en los segundos tipos de tests, principalmente porque el dominio tiene pocas reglas de negocio (decisión didáctica que nos permite concentrarnos más en la persistencia), y porque Springboot también nos ayuda a tener una solución declarativa: casi no hay líneas en la definición del repositorio. En una aplicación comercial, los tests unitarios nos ayudan a iniciar el desarrollo (sobre todo si aplicamos TDD) y **complementan** a los tests de integración, que por su costo suelen ser más escasos y se concentran en los caminos frecuentes que realiza el usuario. No es una decisión excluyente, necesitamos ambos tipos de tests en nuestra arquitectura.
 
@@ -181,8 +175,8 @@ En general el nombre es `application-XXX.yml` donde XXX será el valor que le pa
 
 La segunda anotación que queremos comentar es `@SpringBootTest` que es el que nos permite ejecutar tests de integración. Otras variantes son
 
-- `@DataJpaTest`: útil si queremos hacer el test de integración únicamente contra el repositorio (en el ejemplo nosotros queremos testear la integración del controller con el repositorio). Esto automáticamente configura la base H2 en memoria, sin necesidad de configurarlo nosotros manualmente.
-- `@WebMvcTest`: los conocerán previamente si estuvieron haciendo test de integración de los endpoints, porque levantan un entorno de prueba más rápido que el web server. El tema es que si queremos trabajar con repositorios, tenemos que trabajar con la anotación `@MockBean` que nos permite generar un _mock_ del mismo. Entonces la prueba que estamos haciendo no es completa.
+- `@DataJpaTest`: útil si queremos hacer el test de integración únicamente contra el repositorio (en el ejemplo nosotros queremos testear la integración del controller con el repositorio). Esto automáticamente configura la base H2 en memoria, sin necesidad de que lo hagamos nosotros manualmente.
+- `@WebMvcTest`: sirven para hacer test de integración de los endpoints, porque levantan un entorno de prueba más rápido que el web server. El tema es que si queremos trabajar con repositorios, debemos usar la anotación `@MockBean` que nos permite generar un _mock_ del mismo. Entonces la prueba que estamos haciendo no es completa.
 - `@SpringBootTest`: es el que nos permite generar un entorno de prueba completo, donde no se mockee repositorios ni ningún otro componente, y por lo tanto es el que utilizamos en este caso.
 
 Para más información recomendamos leer [el artículo de Springboot de Baeldung](https://www.baeldung.com/spring-boot-testing)
