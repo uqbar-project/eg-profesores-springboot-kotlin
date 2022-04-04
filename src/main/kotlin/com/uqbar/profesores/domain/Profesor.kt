@@ -14,8 +14,6 @@ class Profesor(@Column var nombreCompleto: String = "") {
     @ManyToMany(fetch = FetchType.LAZY)
     var materias: MutableSet<Materia> = HashSet()
 
-    // Hibernate necesita un constructor sin argumentos
-    // si creás un constructor con parámetros debés agregar uno sin ninguno
 
     fun agregarMateria(materia: Materia) {
         materias.add(materia)

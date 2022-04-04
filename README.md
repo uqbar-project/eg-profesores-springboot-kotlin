@@ -76,7 +76,16 @@ Para ello vamos a necesitar dos pasos:
 1. Aprovechar que el modelo relacional nos permite hacer un JOIN partiendo de cualquiera de las entidades (tiene una navegación más flexible que el modelo de grafo de objetos). Haremos un query en [JPQL](https://es.wikipedia.org/wiki/Java_Persistence_Query_Language) (Java Persistence Query Language), una variante de SQL que trata de acercarse más al paradigma de objetos.
 
 ```kotlin
-@Query("SELECT m.id as id, m.nombre as nombre, m.anio as anio, p.id as profesorId, p.nombreCompleto as profesorNombre FROM Profesor p INNER JOIN p.materias m WHERE m.id = :id")
+@Query("""
+        SELECT m.id as id,
+               m.nombre as nombre, 
+               m.anio as anio,
+               p.id as profesorId,
+               p.nombreCompleto as profesorNombre 
+          FROM Profesor p 
+               INNER JOIN p.materias m
+         WHERE m.id = :id
+        """)
 fun findFullById(id: Long): List<MateriaFullRowDTO>
 ```
 
@@ -85,7 +94,10 @@ El resultado de esa consulta son n registros, porque es el producto cartesiano d
 El DTO es una interfaz, donde por convención los atributos se corresponden con el alias que le pusimos en el query:
 
 ```kotlin
-data class MateriaDTO(val id: Long, val nombre: String, val anio: Int, val profesores: List<ProfesorDTO>)
+data class MateriaDTO(val id: Long, 
+                      val nombre: String, 
+                      val anio: Int, 
+                      val profesores: List<ProfesorDTO>)
 ```
 
 Podemos mapear el atributo de nuestro DTO con otro nombre, mediante la anotación `@Value`:

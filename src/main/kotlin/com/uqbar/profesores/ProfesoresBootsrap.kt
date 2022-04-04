@@ -36,6 +36,7 @@ class ProfesoresBootstrap : InitializingBean {
         repoMaterias.save(algoritmos)
         repoMaterias.save(paradigmas)
         repoMaterias.save(disenio)
+        repoMaterias.save(Materia("Sistemas Operativos", 2))
 
         val spigariol = Profesor("Lucas Spigariol")
         spigariol.agregarMateria(algoritmos)
