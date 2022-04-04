@@ -18,15 +18,15 @@ repositories {
 	mavenCentral()
 }
 
-val springVersion = "2.6.4"
+val springVersion = "2.6.5"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
 	implementation("org.springframework.boot:spring-boot-starter-data-rest:$springVersion")
 	implementation("org.springframework.boot:spring-boot-starter-hateoas:$springVersion")
 	implementation("org.springframework.boot:spring-boot-starter-web-services:$springVersion")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
-	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.6")
@@ -34,6 +34,7 @@ dependencies {
 	testImplementation("com.h2database:h2:2.1.210")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
 	runtimeOnly("mysql:mysql-connector-java:8.0.28")
+	runtimeOnly("com.h2database:h2")
 }
 
 tasks.withType<KotlinCompile> {

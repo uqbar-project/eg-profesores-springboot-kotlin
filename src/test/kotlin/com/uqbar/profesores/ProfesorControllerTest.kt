@@ -36,7 +36,7 @@ class ProfesorControllerTest {
     lateinit var repoMaterias: MateriaRepository
 
     @Test
-    fun `podemos consultar todos los profesores`() {
+    fun `al consultar todos los profesores no sabemos las materias en las que participa`() {
         val responseEntity = mockMvc
             .perform(MockMvcRequestBuilders.get("/profesores"))
             .andReturn().response

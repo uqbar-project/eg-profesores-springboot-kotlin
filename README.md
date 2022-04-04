@@ -144,14 +144,15 @@ Veamos entonces cómo Springboot nos ayuda a construir un entorno de testing que
 
 ```kotlin
 @Test
-@DisplayName("podemos consultar todos los profesores")
-fun profesoresHappyPath() {
-    val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores")).andReturn().response
-    val profesores = mapper.readValue<List<Profesor>>(responseEntity.contentAsString)
-    assertEquals(200, responseEntity.status)
-    assertEquals(3, profesores.size)
-    // los profesores no traen las materias
-    assertEquals(0, profesores.first().materias.size)
+fun `al consultar todos los profesores no sabemos en qué materias participa`() {
+   val responseEntity = mockMvc
+      .perform(MockMvcRequestBuilders.get("/profesores"))
+      .andReturn().response
+   val profesores = mapper.readValue<List<Profesor>>(responseEntity.contentAsString)
+   assertEquals(200, responseEntity.status)
+   assertTrue(profesores.isNotEmpty())
+   // los profesores no traen las materias
+   assertEquals(0, profesores.first().materias.size)
 }
 ```
 
@@ -193,18 +194,54 @@ La segunda anotación que queremos comentar es `@SpringBootTest` que es el que n
 
 Para más información recomendamos leer [el artículo de Springboot de Baeldung](https://www.baeldung.com/spring-boot-testing)
 
+### Prueba de integración a nivel repositorio
+
+Para mostrar un ejemplo de tests de integración a nivel repositorio con la anotación `@DataJpaTest`, vamos a implementar tests contra el query que trae una materia con la lista de profesores, que requiere un _query custom_, ya que testear los queries que genera Springboot automáticamente no tiene mucho sentido.
+
+Tomemos entonces el caso de una materia que tiene dos profesores, debería devolver 2 filas, que representa el producto cartesiano MxP (Materia x Profesor):
+
+```kotlin
+@Test
+fun `al pedir la información de una materia que tiene varios profesores trae una fila por cada profesor (producto cartesiano)`() {
+   // Arrange
+   val materia = materiaRepository.save(Materia(nombre = "Algoritmos II", anio = 1))
+   val profe1 = profesorRepository.save(Profesor(nombreCompleto = "Fernando Dodino").apply {
+      materias = mutableSetOf(materia)
+   })
+   val profe2 = profesorRepository.save(Profesor(nombreCompleto = "Julián Mosquera").apply {
+      materias = mutableSetOf(materia)
+   })
+
+   val materias = materiaRepository.findFullById(materia.id)
+
+   // Assert
+   assertEquals(2, materias.size)
+}
+```
+
+Podríamos hacer un test más exhaustivo, como que la información sobre los profesores o las materias coincida, dejamos al lector la decisión sobre cómo implementar dichos tests.
+
+Algo interesante que ocurre con los `@DataJpaTest` es que
+
+- no producen efectos colaterales, esto significa que al final de cada método los cambios se deshacen
+- esto permite que el siguiente test tenga su propio juego de datos, sin tener dependencia en el orden en que corren los tests, como en el caso de los tests unitarios
+- como la base de datos está embebida en memoria, la ejecución de los tests es rápida
+
+Como contrapartida, al utilizar una base en memoria en lugar de una base real, hay limitaciones en cuanto a su alcance y efectividad para detectar problemas antes de la salida a producción.
+
 ### Ver datos de un profesor
 
 En este test queremos traer el dato de un profesor:
 
 ```kotlin
 @Test
-@DisplayName("al traer el dato de un profesor trae las materias en las que participa")
-fun profesorExistenteConMaterias() {
-    val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/$ID_PROFESOR")).andReturn().response
-    assertEquals(200, responseEntity.status)
-    val profesor = mapper.readValue<Profesor>(responseEntity.contentAsString)
-    assertEquals(2, profesor.materias.size)
+fun `al traer el dato de un profesor trae las materias en las que participa`() {
+   val profesorPrueba = getProfesor(ID_PROFESOR)
+
+   val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/${profesorPrueba.id}")).andReturn().response
+   assertEquals(200, responseEntity.status)
+   val profesor = mapper.readValue<Profesor>(responseEntity.contentAsString)
+   assertEquals(profesorPrueba.materias.size, profesor.materias.size)
 }
 ```
 
@@ -260,7 +297,7 @@ fun `podemos actualizar la informacion de un profesor`() {
 }
 ```
 
-### Variante más declarativa
+### Variante con asserts más declarativos
 
 Vemos a continuación un ejemplo de cómo testeamos el controller de materias, en forma más declarativa:
 
@@ -282,6 +319,7 @@ fun `al buscar la informacion de una materia correcta recibimos la agrupacion de
 
 ## Material adicional
 
+- [Testeo con @DataJPATest - recomendaciones](https://reflectoring.io/spring-boot-data-jpa-test/)
 - [Artículo de Baeldung](https://www.baeldung.com/jpa-many-to-many), donde define una relación many-to-many en forma bidireccional
 - [Artículo de Stack Overflow](https://stackoverflow.com/questions/42394095/many-to-many-relationship-between-two-entities-in-spring-boot)
 - [Testeo unitario y testeo de integración](https://www.testim.io/blog/unit-test-vs-integration-test/)
