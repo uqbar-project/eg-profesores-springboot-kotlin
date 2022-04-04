@@ -52,5 +52,6 @@ class ProfesoresBootstrap : InitializingBean {
         repoProfes.save(spigariol)
         repoProfes.save(passerini)
         repoProfes.save(dodino)
+
     }
 }

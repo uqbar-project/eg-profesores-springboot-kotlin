@@ -229,6 +229,21 @@ Algo interesante que ocurre con los `@DataJpaTest` es que
 
 Como contrapartida, al utilizar una base en memoria en lugar de una base real, hay limitaciones en cuanto a su alcance y efectividad para detectar problemas antes de la salida a producción.
 
+### Test de Controllers
+
+La anotación `@WebMvcTest` permite hacer testeos a nivel http sobre los controllers, utilizando también el objeto mockMvc. Los tests tienen un alcance limitado y necesitan mockear o definir los beans que queremos inyectar como dependencias, por eso no son tan adecuados para esta materia como los `@SpringBootTest` que veremos a continuación.
+
+Dejamos un ejemplo ilustrativo, donde utilizando `@MockBean` y Mockito mostramos un ejemplo de cómo funciona el controller cuando el service no encuentra una materia en el método GET que devuelve los datos de una materia:
+
+```kt
+@Test
+fun `al pedir la informacion completa de una materia que no existe tiene que devolver un 404`() {
+  Mockito.`when`(materiaService.getMateria(1)).thenAnswer { throw NotFoundException("Materia no existe") }
+  mockMvc.perform(MockMvcRequestBuilders.get("/materias/1"))
+     .andExpect(MockMvcResultMatchers.status().isNotFound)
+}
+```
+
 ### Ver datos de un profesor
 
 En este test queremos traer el dato de un profesor:

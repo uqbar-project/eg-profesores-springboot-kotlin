@@ -17,7 +17,7 @@ class ProfesorService {
     lateinit var profesorRepository: ProfesorRepository
 
     @Transactional(readOnly = true)
-    fun getProfesores() = this.profesorRepository.findAll().map { ProfesorBasicoDTO(it) }.toList()
+    fun getProfesores() = this.profesorRepository.findAll()
 
     @Transactional(readOnly = true)
     fun getProfesor(@PathVariable id: Long) =

@@ -1,6 +1,7 @@
 package com.uqbar.profesores.controller
 
 import com.uqbar.profesores.domain.Profesor
+import com.uqbar.profesores.serializer.ProfesorBasicoDTO
 import com.uqbar.profesores.service.ProfesorService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +15,7 @@ class ProfesorController {
 
     @GetMapping("/profesores")
     @Operation(summary = "Devuelve todos los profesores, sin las materias")
-    fun getProfesores() = profesorService.getProfesores()
+    fun getProfesores() = profesorService.getProfesores().map { ProfesorBasicoDTO(it) }.toList()
 
     @GetMapping("/profesores/{id}")
     @Operation(summary = "Devuelve un profesor, con sus materias")
