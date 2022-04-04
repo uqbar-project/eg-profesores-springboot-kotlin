@@ -14,10 +14,7 @@ class Profesor(@Column var nombreCompleto: String = "") {
     @ManyToMany(fetch = FetchType.LAZY)
     var materias: MutableSet<Materia> = HashSet()
 
-
     fun agregarMateria(materia: Materia) {
         materias.add(materia)
     }
-
-    override fun toString() = "$nombreCompleto ($id)"
 }

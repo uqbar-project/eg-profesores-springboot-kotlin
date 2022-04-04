@@ -6,6 +6,7 @@ import com.uqbar.profesores.domain.Profesor
 import com.uqbar.profesores.repos.MateriaRepository
 import com.uqbar.profesores.repos.ProfesorRepository
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,22 +42,24 @@ class ProfesorControllerTest {
             .andReturn().response
         val profesores = mapper.readValue<List<Profesor>>(responseEntity.contentAsString)
         assertEquals(200, responseEntity.status)
-        assertEquals(3, profesores.size)
+        assertTrue(profesores.isNotEmpty())
         // los profesores no traen las materias
         assertEquals(0, profesores.first().materias.size)
     }
 
     @Test
     fun `al traer el dato de un profesor trae las materias en las que participa`() {
-        val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/$ID_PROFESOR")).andReturn().response
+        val profesorPrueba = getProfesor(ID_PROFESOR)
+
+        val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/${profesorPrueba.id}")).andReturn().response
         assertEquals(200, responseEntity.status)
         val profesor = mapper.readValue<Profesor>(responseEntity.contentAsString)
-        assertEquals(2, profesor.materias.size)
+        assertEquals(profesorPrueba.materias.size, profesor.materias.size)
     }
 
     @Test
     fun `no podemos traer informacion de un profesor inexistente`() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/profesores/100"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/profesores/10000"))
             .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
@@ -76,11 +79,12 @@ class ProfesorControllerTest {
 
     @Test
     fun `no podemos actualizar un profesor inexistente`() {
+        val idInexistente = 10022L
         val profesorBody = mapper.writeValueAsString(Profesor().apply {
             nombreCompleto = "Juan Contardo"
-            id = 100
+            id = idInexistente
         })
-        mockMvc.perform(MockMvcRequestBuilders.put("/profesores/100")
+        mockMvc.perform(MockMvcRequestBuilders.put("/profesores/$idInexistente")
             .contentType("application/json")
             .content(profesorBody)
         ).andExpect(MockMvcResultMatchers.status().isNotFound)

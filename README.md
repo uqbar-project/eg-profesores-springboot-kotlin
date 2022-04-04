@@ -260,9 +260,29 @@ fun `podemos actualizar la informacion de un profesor`() {
 }
 ```
 
+### Variante más declarativa
+
+Vemos a continuación un ejemplo de cómo testeamos el controller de materias, en forma más declarativa:
+
+```kt
+@Test
+fun `al buscar la informacion de una materia correcta recibimos la agrupacion de profesores que la dan`() {
+    val materia = repoMaterias.findAll().first()
+    mockMvc.perform(MockMvcRequestBuilders.get("/materias/${materia.id}"))
+        .andExpect(MockMvcResultMatchers.status().isOk)
+        .andExpect(MockMvcResultMatchers.jsonPath("$.nombre").value(materia.nombre))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.anio").value(materia.anio))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.profesores").isArray)
+}
+```
+
+- en lugar de utilizar un mapper y chequear contra un objeto, utilizamos matchers de JSON, donde `$.profesores` hace referencia al elemento profesores del JSON que se devuelve
+- tampoco chequeamos el tamaño exacto de la colección, de esa manera **nuestros tests se vuelven más resilientes ante cambios en los datos de prueba** (solo verificamos que la lista de profesores devuelta sea un array)
+- y también utilizamos cualquier materia en lugar de trabajar con un ID específico, eso también ayuda al mantenimiento posterior. A cambio debemos tener cuidado con la instrucción `repoMaterias.findAll().first()` si nuestro bootstrap va a instanciar una gran cantidad de datos (algo improbable pero que puede darse) 
+
 ## Material adicional
 
-- [Artículo de Baeldung](https://www.baeldung.com/jpa-many-to-many), donde define la relación en forma bidireccional
+- [Artículo de Baeldung](https://www.baeldung.com/jpa-many-to-many), donde define una relación many-to-many en forma bidireccional
 - [Artículo de Stack Overflow](https://stackoverflow.com/questions/42394095/many-to-many-relationship-between-two-entities-in-spring-boot)
 - [Testeo unitario y testeo de integración](https://www.testim.io/blog/unit-test-vs-integration-test/)
 

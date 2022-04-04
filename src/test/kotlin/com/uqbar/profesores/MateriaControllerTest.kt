@@ -1,6 +1,5 @@
 package com.uqbar.profesores
 
-import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider
 import com.uqbar.profesores.repos.MateriaRepository
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -12,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
+const val MATERIA_SIN_PROFESORES = "Sistemas Operativos"
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,7 +30,7 @@ class MateriaControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/materias"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(4))
+            .andExpect(MockMvcResultMatchers.jsonPath("$").isArray)
     }
 
     @Test
@@ -50,8 +50,8 @@ class MateriaControllerTest {
     }
 
     @Test
-    fun `al buscar la informacion de una materia que no tiene docentes recibimos una lista vacía de profesores que la dan`() {
-        val materia = repoMaterias.findByNombre("Sistemas Operativos").first()
+    fun `al buscar la informacion de una materia que no tiene docentes recibimos una lista vacia de profesores que la dan`() {
+        val materia = repoMaterias.findByNombre(MATERIA_SIN_PROFESORES).first()
         mockMvc.perform(MockMvcRequestBuilders.get("/materias/${materia.id}"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("$.nombre").value(materia.nombre))
