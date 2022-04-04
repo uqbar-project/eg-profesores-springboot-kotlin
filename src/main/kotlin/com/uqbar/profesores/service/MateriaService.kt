@@ -4,6 +4,7 @@ import com.uqbar.profesores.errorHandling.NotFoundException
 import com.uqbar.profesores.repos.MateriaRepository
 import com.uqbar.profesores.serializer.MateriaDTO
 import com.uqbar.profesores.serializer.ProfesorDTO
+import org.hibernate.annotations.NotFound
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,10 +20,14 @@ class MateriaService {
 
     @Transactional(readOnly = true)
     fun getMateria(id: Long): MateriaDTO {
+        // Validación de que la materia existe
+        val materiaOriginal = materiaRepository.findById(id)
+            .orElseThrow { NotFoundException("La materia con identificador $id no existe") }
+
         // Recibimos n registros de materias
         val materiasDTO = materiaRepository.findFullById(id)
         if (materiasDTO.isEmpty()) {
-            throw NotFoundException("La materia con identificador $id no existe")
+            return MateriaDTO(materiaOriginal.id, materiaOriginal.nombre, materiaOriginal.anio, listOf())
         }
 
         // Agrupamos los profesores de la materia

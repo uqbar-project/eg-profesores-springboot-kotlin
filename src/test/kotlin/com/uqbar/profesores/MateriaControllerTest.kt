@@ -30,7 +30,7 @@ class MateriaControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/materias"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(4))
     }
 
     @Test
@@ -48,4 +48,15 @@ class MateriaControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.anio").value(materia.anio))
             .andExpect(MockMvcResultMatchers.jsonPath("$.profesores").isArray)
     }
+
+    @Test
+    fun `al buscar la informacion de una materia que no tiene docentes recibimos una lista vacía de profesores que la dan`() {
+        val materia = repoMaterias.findByNombre("Sistemas Operativos").first()
+        mockMvc.perform(MockMvcRequestBuilders.get("/materias/${materia.id}"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nombre").value(materia.nombre))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.anio").value(materia.anio))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.profesores").isEmpty)
+    }
+
 }
