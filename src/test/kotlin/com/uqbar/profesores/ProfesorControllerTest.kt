@@ -2,6 +2,7 @@ package com.uqbar.profesores
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.uqbar.profesores.domain.Materia
 import com.uqbar.profesores.domain.Profesor
 import com.uqbar.profesores.repos.MateriaRepository
 import com.uqbar.profesores.repos.ProfesorRepository
@@ -23,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional
 @ActiveProfiles("test")
 @DisplayName("Dado un controller de profesores")
 class ProfesorControllerTest {
-    private val ID_PROFESOR = 1L
     private val mapper = jacksonObjectMapper()
 
     @Autowired
@@ -49,7 +49,9 @@ class ProfesorControllerTest {
 
     @Test
     fun `al traer el dato de un profesor trae las materias en las que participa`() {
-        val profesorPrueba = getProfesor(ID_PROFESOR)
+        val profesorId = crearProfesorConMaterias()
+
+        val profesorPrueba = getProfesor(profesorId)
 
         val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/${profesorPrueba.id}")).andReturn().response
         assertEquals(200, responseEntity.status)
@@ -66,15 +68,23 @@ class ProfesorControllerTest {
     @Test
     @Transactional
     fun `podemos actualizar la informacion de un profesor`() {
-        val profesor = getProfesor(ID_PROFESOR)
-        val materias = repoMaterias.findByNombre("Diseño de Sistemas")
-        assertEquals(1, materias.size)
-        val materiaNueva = materias.first()
-        profesor.agregarMateria(materiaNueva)
-        updateProfesor(ID_PROFESOR, profesor)
-        val nuevoProfesor = getProfesor(ID_PROFESOR)
-        val materiasDelProfesor = profesor.materias.size
-        assertEquals(materiasDelProfesor, nuevoProfesor.materias.size)
+        // Arrange
+        val profesorId = crearProfesorConMaterias()
+        val profesorOriginal = getProfesor(profesorId)
+        val materiaNueva = repoMaterias.save(Materia().apply {
+            nombre = "Ingeniería de Software"
+        })
+        val cantidadMateriasOriginales = profesorOriginal.materias.size
+        assertEquals(1, cantidadMateriasOriginales)
+
+        // Act
+        profesorOriginal.agregarMateria(materiaNueva)
+        updateProfesor(profesorOriginal)
+
+        // Assert
+        val nuevoProfesor = getProfesor(profesorOriginal.id)
+        val materiasDelProfesorAhora = nuevoProfesor.materias.size
+        assertEquals(materiasDelProfesorAhora, cantidadMateriasOriginales + 1)
     }
 
     @Test
@@ -90,9 +100,9 @@ class ProfesorControllerTest {
         ).andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
-    private fun updateProfesor(idProfesor: Long, profesor: Profesor) {
+    private fun updateProfesor(profesor: Profesor) {
         val profesorBody = mapper.writeValueAsString(profesor)
-        mockMvc.perform(MockMvcRequestBuilders.put("/profesores/$idProfesor")
+        mockMvc.perform(MockMvcRequestBuilders.put("/profesores/${profesor.id}")
                 .contentType("application/json")
                 .content(profesorBody)
         ).andExpect(MockMvcResultMatchers.status().isOk)
@@ -100,4 +110,19 @@ class ProfesorControllerTest {
 
     private fun getProfesor(idProfesor: Long): Profesor =
         repoProfes.findById(idProfesor).orElseThrow { RuntimeException("Profesor con identificador $idProfesor no existe") }
+
+    private fun crearProfesorConMaterias(): Long {
+        val materia = Materia().apply {
+            anio = 2
+            nombre = "Algoritmos I"
+        }
+        repoMaterias.save(materia)
+        val profesor = repoProfes.save(Profesor().apply {
+            nombreCompleto = "Juana Fischetti"
+            materias = mutableSetOf(materia)
+        })
+        return profesor.id
+    }
+
+
 }
