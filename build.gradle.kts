@@ -34,7 +34,6 @@ dependencies {
 	testImplementation("com.h2database:h2:2.1.210")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
 	runtimeOnly("mysql:mysql-connector-java:8.0.28")
-	runtimeOnly("com.h2database:h2")
 }
 
 tasks.withType<KotlinCompile> {
