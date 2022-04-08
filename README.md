@@ -111,6 +111,8 @@ interface MateriaFullRowDTO {
 }
 ```
 
+En este caso el campo `nombre` se asocia al valor que vamos a llamar `nombreLindo` en nuestro DTO.
+
 2. Como queremos que el endpoint devuelva una sola entidad materia, vamos a agrupar todos los profesores en una lista, y tomaremos la información de la materia una sola vez (porque sabemos que las otras filas simplemente repiten el dato):
 
 ```kotlin
@@ -144,15 +146,15 @@ Veamos entonces cómo Springboot nos ayuda a construir un entorno de testing que
 
 ```kotlin
 @Test
-fun `al consultar todos los profesores no sabemos en qué materias participa`() {
-   val responseEntity = mockMvc
-      .perform(MockMvcRequestBuilders.get("/profesores"))
-      .andReturn().response
-   val profesores = mapper.readValue<List<Profesor>>(responseEntity.contentAsString)
-   assertEquals(200, responseEntity.status)
-   assertTrue(profesores.isNotEmpty())
-   // los profesores no traen las materias
-   assertEquals(0, profesores.first().materias.size)
+fun `al consultar todos los profesores no sabemos las materias en las que participa`() {
+    val responseEntity = mockMvc
+        .perform(MockMvcRequestBuilders.get("/profesores"))
+        .andReturn().response
+    val profesores = mapper.readValue<List<Profesor>>(responseEntity.contentAsString)
+    assertEquals(200, responseEntity.status)
+    assertTrue(profesores.isNotEmpty())
+    // los profesores no traen las materias
+    assertEquals(0, profesores.first().materias.size)
 }
 ```
 
@@ -235,7 +237,7 @@ La anotación `@WebMvcTest` permite hacer testeos a nivel http sobre los control
 
 Dejamos un ejemplo ilustrativo, donde utilizando `@MockBean` y Mockito mostramos un ejemplo de cómo funciona el controller cuando el service no encuentra una materia en el método GET que devuelve los datos de una materia:
 
-```kt
+```kotlin
 @Test
 fun `al pedir la informacion completa de una materia que no existe tiene que devolver un 404`() {
   Mockito.`when`(materiaService.getMateria(1)).thenAnswer { throw NotFoundException("Materia no existe") }
@@ -246,27 +248,23 @@ fun `al pedir la informacion completa de una materia que no existe tiene que dev
 
 ### Ver datos de un profesor
 
-En este test queremos traer el dato de un profesor:
+En este test queremos traer el dato de un profesor. Para garantizar que el test no dependa de ningún dato creado anteriormente, en la fase `Arrange` vamos a crear un ejemplo para usarlo luego:
 
 ```kotlin
 @Test
 fun `al traer el dato de un profesor trae las materias en las que participa`() {
-   val profesorPrueba = getProfesor(ID_PROFESOR)
+    val profesorId = crearProfesorConMaterias()
 
-   val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/${profesorPrueba.id}")).andReturn().response
-   assertEquals(200, responseEntity.status)
-   val profesor = mapper.readValue<Profesor>(responseEntity.contentAsString)
-   assertEquals(profesorPrueba.materias.size, profesor.materias.size)
+    val profesorPrueba = getProfesor(profesorId)
+
+    val responseEntity = mockMvc.perform(MockMvcRequestBuilders.get("/profesores/${profesorPrueba.id}")).andReturn().response
+    assertEquals(200, responseEntity.status)
+    val profesor = mapper.readValue<Profesor>(responseEntity.contentAsString)
+    assertEquals(profesorPrueba.materias.size, profesor.materias.size)
 }
 ```
 
-Para ello definimos el identificador del profesor como el número 1, de tipo Long (por eso el sufijo `L`):
-
-```kotlin
-private val ID_PROFESOR = 1L
-```
-
-Para estar seguros de que el identificador 1 existe, el atributo `id` de la entidad Profesor tiene que apuntar a una secuencia autoincremental que sea exclusiva de la tabla de profesores, esto se hace de la siguiente manera:
+Una configuración que permite que los profesores tengan su propio ID autoincremental es mediante la siguiente anotación:
 
 ```kotlin
 @Id
@@ -282,11 +280,6 @@ Es importante tener el control del identificador que se genera porque es nuestro
 - nos devuelva un código http 200
 - y que además la información del profesor contenga las materias que da ese docente
 
-**Variantes**:
-
-- al crear el profesor, quedarme con el ID (es una forma mucho más segura de garantizar que apuntamos al profesor correcto)
-- en lugar de utilizar el **mapper**, podemos hacer búsquedas por JsonPath, como pueden ver en los tests de Materia.
-
 ### Test de actualización
 
 Por último, tenemos un test de integración que va a producir un efecto colateral. En este caso vamos a
@@ -300,15 +293,23 @@ Por último, tenemos un test de integración que va a producir un efecto colater
 @Test
 @Transactional
 fun `podemos actualizar la informacion de un profesor`() {
-    val profesor = getProfesor(ID_PROFESOR)
-    val materias = repoMaterias.findByNombre("Diseño de Sistemas")
-    assertEquals(1, materias.size)
-    val materiaNueva = materias.first()
-    profesor.agregarMateria(materiaNueva)
-    updateProfesor(ID_PROFESOR, profesor)
-    val nuevoProfesor = getProfesor(ID_PROFESOR)
-    val materiasDelProfesor = profesor.materias.size
-    assertEquals(materiasDelProfesor, nuevoProfesor.materias.size)
+   // Arrange
+   val profesorId = crearProfesorConMaterias()
+   val profesorOriginal = getProfesor(profesorId)
+   val materiaNueva = repoMaterias.save(Materia().apply {
+      nombre = "Ingeniería de Software"
+   })
+   val cantidadMateriasOriginales = profesorOriginal.materias.size
+   assertEquals(1, cantidadMateriasOriginales)
+
+   // Act
+   profesorOriginal.agregarMateria(materiaNueva)
+   updateProfesor(profesorOriginal)
+
+   // Assert
+   val nuevoProfesor = getProfesor(profesorOriginal.id)
+   val materiasDelProfesorAhora = nuevoProfesor.materias.size
+   assertEquals(materiasDelProfesorAhora, cantidadMateriasOriginales + 1)
 }
 ```
 
@@ -342,4 +343,3 @@ fun `al buscar la informacion de una materia correcta recibimos la agrupacion de
 ## Diagrama entidad-relación
 
 ![Solución](./images/DER.png)
-
