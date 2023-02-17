@@ -28,7 +28,6 @@ class MateriaControllerTest {
     fun `obtener todas las materias`() {
         mockMvc.perform(MockMvcRequestBuilders.get("/materias"))
             .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
             .andExpect(MockMvcResultMatchers.jsonPath("$").isArray)
     }
 

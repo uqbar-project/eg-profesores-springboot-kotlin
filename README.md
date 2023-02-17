@@ -4,15 +4,26 @@
 
 ## Prerrequisitos
 
-- Necesitás instalar un motor de base de datos relacional (te recomendamos [MySQL](https://www.mysql.com/) que es OpenSource y gratuito)
-- Revisá la password para conectarte a la base en el archivo [`application.yml`](./src/main/resources/application.yml):
+Solo hace falta tener instalado [Docker](https://www.docker.com/). Una vez resuelto este paso abrí una consola de comandos y escribí
+
+```bash
+docker-compose up
+```
+
+Eso levanta tanto PostgreSQL como el cliente pgAdmin, como está explicado en [este ejemplo](https://github.com/uqbar-project/eg-manejo-proyectos-sql).
+
+La conexión a la base se configura en el archivo [`application.yml`](./src/main/resources/application.yml):
 
 ```yml
-    datasource:
-      url: jdbc:mysql://localhost/facultad?createDatabaseIfNotExist=true
-      username: root
-      password:   # acá podés dejarla en blanco si no tenés contraseña o escribir la tuya
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/facultad
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
 ```
+
+- `0.0.0.0` apunta a nuestro contenedor de Docker
+- el usuario y contraseña está definido en el archivo `docker-compose.yml`
 
 ## Objetivo
 

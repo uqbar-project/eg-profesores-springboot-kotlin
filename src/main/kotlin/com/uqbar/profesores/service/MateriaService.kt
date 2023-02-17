@@ -4,10 +4,9 @@ import com.uqbar.profesores.errorHandling.NotFoundException
 import com.uqbar.profesores.repos.MateriaRepository
 import com.uqbar.profesores.serializer.MateriaDTO
 import com.uqbar.profesores.serializer.ProfesorDTO
-import org.hibernate.annotations.NotFound
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import jakarta.transaction.Transactional
 
 @Service
 class MateriaService {
@@ -15,10 +14,10 @@ class MateriaService {
     @Autowired
     lateinit var materiaRepository: MateriaRepository
 
-    @Transactional(readOnly = true)
+    @Transactional(Transactional.TxType.NEVER)
     fun getMaterias() = materiaRepository.findAll()
 
-    @Transactional(readOnly = true)
+    @Transactional(Transactional.TxType.NEVER)
     fun getMateria(id: Long): MateriaDTO {
         // Validación de que la materia existe
         val materiaOriginal = materiaRepository.findById(id)
