@@ -23,6 +23,3 @@ jobs:
 
       # Send JaCoCo reports to codecov
       - uses: codecov/codecov-action@v3
-
-      # Send JaCoCo reports to codecov
-      - run: bash <(curl -s https://codecov.io/bash)
