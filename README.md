@@ -4,10 +4,11 @@
 
 ## Prerrequisitos
 
-Solo hace falta tener instalado [Docker](https://www.docker.com/). Una vez resuelto este paso abrí una consola de comandos y escribí
+Solo hace falta tener instalado Docker Desktop (el pack docker engine y docker compose), seguí las instrucciones de [esta página](https://phm.uqbar-project.org/material/software) en el párrafo `Docker`.
+
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 Eso levanta tanto PostgreSQL como el cliente pgAdmin, como está explicado en [este ejemplo](https://github.com/uqbar-project/eg-manejo-proyectos-sql).
