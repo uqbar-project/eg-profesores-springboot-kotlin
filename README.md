@@ -43,16 +43,16 @@ http://localhost:8080/swagger-ui/index.html#
 
 ## Endpoints comunes
 
-- `GET ./profesores/`: devuelve la lista de profesores, sin las materias
-- `GET ./profesores/{id}`: devuelve los datos de un profesor con sus materias
-- `GET ./materias/`: devuelve la lista de materias
-- `PUT ./profesores/{id}`: actualiza un profesor con los datos del body
+- `GET /profesores/`: devuelve la lista de profesores, sin las materias
+- `GET /profesores/{id}`: devuelve los datos de un profesor con sus materias
+- `GET /materias/`: devuelve la lista de materias
+- `PUT /profesores/{id}`: actualiza un profesor con los datos del body
 
 Se puede importar el archivo [Insomnia_Profesores.json](Insomnia_Profesores.json) en Insomnia, para tenerlos a mano.
 
 ## Endpoint especial
 
-- `GET ./materias/{id}`: devuelve una materia, con sus profesores. 
+- `GET /materias/{id}`: devuelve una materia, con sus profesores. 
 
 Una decisión de diseño importante que tomamos fue **no tener referencias bidireccionales** (de profesor a materias y de materia a profesores). El primer motivo es didático, el segundo es que mantener esa relación bidireccional tiene un costo y debemos decidir quién es el dueño de esa relación (para no entrar en loop al agregar un profesor a una materia, además del agregado en cada una de las colecciones). Pueden consultar [este post de Stack overflow](https://stackoverflow.com/questions/22461613/pros-and-cons-of-jpa-bidirectional-relationships) para más información.
 
@@ -148,9 +148,9 @@ fun getMateria(id: Long): MateriaDTO {
 Como cuenta [este artículo](https://www.testim.io/blog/unit-test-vs-integration-test/), tenemos que tomar una decisión de diseño sobre cómo testear este componente que creamos. Sabemos que
 
 - los tests unitarios prueban una unidad funcional, no trabajan con la base de datos ni con la red, como consecuencia **son más rápidos de ejecutar y más fáciles para generar y mantener**. Como contrapartida, necesitan mecanismos para simular efectos, operaciones costosas o donde interviene el azar, y es importante entender que eso reduce la eficacia para encontrar problemas.
-- por otra parte, los tests de integración requieren un mayor esfuerzo de desarrollo, porque están probando la integración de varios componentes de nuestra arquitectura.
+- por otra parte, los tests de integración requieren un mayor esfuerzo de desarrollo, porque están probando la interacción de varios componentes de nuestra arquitectura.
 
-En este caso nos vamos a concentrar más en los segundos tipos de tests, principalmente porque el dominio tiene pocas reglas de negocio (decisión didáctica que nos permite concentrarnos más en la persistencia), y porque Springboot también nos ayuda a tener una solución declarativa: casi no hay líneas en la definición del repositorio. En una aplicación comercial, los tests unitarios nos ayudan a iniciar el desarrollo (sobre todo si aplicamos TDD) y **complementan** a los tests de integración, que por su costo suelen ser más escasos y se concentran en los caminos frecuentes que realiza el usuario. No es una decisión excluyente, necesitamos ambos tipos de tests en nuestra arquitectura.
+En este caso nos vamos a concentrar más en los segundos tipos de test, principalmente porque el dominio tiene pocas reglas de negocio (decisión didáctica que nos permite concentrarnos más en la persistencia), y porque Springboot también nos ayuda a tener una solución declarativa: casi no hay líneas en la definición del repositorio. En una aplicación comercial, los tests unitarios nos ayudan a iniciar el desarrollo (sobre todo si aplicamos TDD) y **complementan** a los tests de integración, que por su costo suelen ser más escasos y se concentran en los caminos frecuentes que realiza el usuario. No es una decisión excluyente, necesitamos ambos tipos de tests en nuestra arquitectura.
 
 ### Implementación del primer test de integración
 
@@ -200,8 +200,7 @@ En general el nombre es `application-XXX.yml` donde XXX será el valor que le pa
 
 ### Tipos de tests de Springboot
 
-La segunda anotación que queremos comentar es `@SpringBootTest` que es el que nos permite ejecutar tests de integración. Otras variantes son
-
+Las variantes que tenemos a la hora de definir tests en Springboot son:
 - `@DataJpaTest`: útil si queremos hacer el test de integración únicamente contra el repositorio (en el ejemplo nosotros queremos testear la integración del controller con el repositorio). Esto automáticamente configura la base H2 en memoria, sin necesidad de que lo hagamos nosotros manualmente.
 - `@WebMvcTest`: sirven para hacer test de integración de los endpoints, porque levantan un entorno de prueba más rápido que el web server. El tema es que si queremos trabajar con repositorios, debemos usar la anotación `@MockBean` que nos permite generar un _mock_ del mismo. Entonces la prueba que estamos haciendo no es completa.
 - `@SpringBootTest`: es el que nos permite generar un entorno de prueba completo, donde no se mockee repositorios ni ningún otro componente, y por lo tanto es el que utilizamos en este caso.
@@ -210,7 +209,7 @@ Para más información recomendamos leer [el artículo de Springboot de Baeldung
 
 ### Prueba de integración a nivel repositorio
 
-Para mostrar un ejemplo de tests de integración a nivel repositorio con la anotación `@DataJpaTest`, vamos a implementar tests contra el query que trae una materia con la lista de profesores, que requiere un _query custom_, ya que testear los queries que genera Springboot automáticamente no tiene mucho sentido.
+Para mostrar un ejemplo de tests de integración a nivel repositorio con la anotación `@DataJpaTest`, vamos a implementar tests contra la consulta que trae una materia con la lista de profesores. Esta tiene una definición específica, ya que testear los queries que vienen con los repositorios de Springboot no tiene mucho sentido.
 
 Tomemos entonces el caso de una materia que tiene dos profesores, debería devolver 2 filas, que representa el producto cartesiano MxP (Materia x Profesor):
 
@@ -258,7 +257,9 @@ fun `al pedir la informacion completa de una materia que no existe tiene que dev
 }
 ```
 
-### Ver datos de un profesor
+### Tests de Integración @SpringBootTest
+
+#### Ver datos de un profesor
 
 En este test queremos traer el dato de un profesor. Para garantizar que el test no dependa de ningún dato creado anteriormente, en la fase `Arrange` vamos a crear un ejemplo para usarlo luego:
 
@@ -276,23 +277,12 @@ fun `al traer el dato de un profesor trae las materias en las que participa`() {
 }
 ```
 
-Una configuración que permite que los profesores tengan su propio ID autoincremental es mediante la siguiente anotación:
-
-```kotlin
-@Id
-// El GenerationType asociado a la TABLE es importante para tener
-// una secuencia de identificadores única para los profesores
-// (para que no dependa de otras entidades anteriormente creadas)
-@GeneratedValue(strategy = GenerationType.TABLE)
-var id: Long = 0
-```
-
 Es importante tener el control del identificador que se genera porque es nuestro punto de entrada para hacer el pedido get al controller. Luego validamos que
 
 - nos devuelva un código http 200
 - y que además la información del profesor contenga las materias que da ese docente
 
-### Test de actualización
+#### Test de actualización
 
 Por último, tenemos un test de integración que va a producir un efecto colateral. En este caso vamos a
 
