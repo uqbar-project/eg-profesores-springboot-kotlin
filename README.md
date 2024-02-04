@@ -175,12 +175,17 @@ El mismo mecanismo de bootstrap que crea los profesores para levantar la aplicac
 ```kotlin
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+// @ActiveProfiles("test")
 @DisplayName("Dado un controller de profesores")
 class ProfesorControllerTest {
 ```
 
-La anotación ActiveProfiles que contiene el valor `test` por convención nos permite definir en un archivo `application-test.yml` la conexión a la base en memoria:
+Para cambiar la configuración en test tenemos dos opciones:
+
+- descomentar la anotación ActiveProfiles y generar un archivo `application-test.yml` (el nombre test debe coincidir con el nombre que le pasás a la configuración)
+- otra opción más simple que no necesita la anotación es ubicar un archivo de configuración `application.yml` diferente, en la carpeta `src/test/resources` 
+
+La conexión a la base en memoria:
 
 ```yml
 spring:
@@ -190,13 +195,11 @@ spring:
       path: /h2
 
   datasource:
-    url: jdbc:h2:mem:test
+    url: jdbc:h2:mem:mydb
     username: sa
     password: sa
-    driver-class-name: org.h2.Driver
+    driverClassName: org.h2.Driver
 ```
-
-En general el nombre es `application-XXX.yml` donde XXX será el valor que le pasaremos a la anotación ActiveProfiles.
 
 ### Tipos de tests de Springboot
 
