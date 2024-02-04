@@ -4,9 +4,9 @@ import com.uqbar.profesores.errorHandling.NotFoundException
 import com.uqbar.profesores.repos.MateriaRepository
 import com.uqbar.profesores.serializer.MateriaDTO
 import com.uqbar.profesores.serializer.ProfesorDTO
+import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import jakarta.transaction.Transactional
 
 @Service
 class MateriaService {

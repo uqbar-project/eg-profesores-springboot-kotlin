@@ -1,26 +1,28 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "3.0.2"
-	id("io.spring.dependency-management") version "1.1.0"
-	kotlin("jvm") version "1.8.10"
-	kotlin("plugin.spring") version "1.8.10"
-	kotlin("plugin.jpa") version "1.8.10"
+	id("org.springframework.boot") version "3.2.2"
+	id("io.spring.dependency-management") version "1.1.4"
+	kotlin("jvm") version "1.9.22"
+	kotlin("plugin.spring") version "1.9.22"
+	kotlin("plugin.jpa") version "1.9.22"
 	jacoco
 }
 
-extra["springCloudVersion"] = "2022.0.0"
-
 group = "org.uqbar"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+}
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
 	// básicos de cualquier proyecto Spring Boot
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-hateoas")
@@ -28,30 +30,21 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2")
-	implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
-	implementation("org.springframework.boot:spring-boot-devtools")
 
 	// conexión a la base de datos
-	implementation("org.postgresql:postgresql:42.5.3")
+	runtimeOnly("org.postgresql:postgresql")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
 	// testing
-	testImplementation("com.h2database:h2:2.1.214")
+	testImplementation("com.h2database:h2:2.2.224")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-dependencyManagement {
-	imports {
-		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-	}
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
-		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "17"
+		freeCompilerArgs += "-Xjsr305=strict"
+		jvmTarget = "21"
 	}
 }
 
@@ -68,7 +61,7 @@ tasks.jacocoTestReport {
 }
 
 jacoco {
-	toolVersion = "0.8.8"
+	toolVersion = "0.8.11"
 }
 
 tasks.jacocoTestReport {

@@ -4,8 +4,7 @@
 
 ## Prerrequisitos
 
-Solo hace falta tener instalado Docker Desktop (el pack docker engine y docker compose), seguí las instrucciones de [esta página](https://phm.uqbar-project.org/material/software) en el párrafo `Docker`.
-
+Solo hace falta tener instalado algún Desktop de Docker (el pack docker engine y docker compose), seguí las instrucciones de [esta página](https://phm.uqbar-project.org/material/software) en el párrafo `Docker`.
 
 ```bash
 docker compose up
@@ -32,14 +31,6 @@ Un profesor dicta una o varias materias, y a su vez cada materia es dictada por 
 
 - el modelo de objetos, donde simplemente tenemos una colección de materias en profesor (y podríamos tener eventualmente una colección de profesores en materia)
 - el modelo relacional, que requiere una entidad que relacione profesor y materia mediante claves foráneas que referencien a sus identificadores. Esto no necesita de una entidad extra en el modelo de objetos porque de esa relación no nacen atributos (aunque podrían, si quisiéramos guardar por ejemplo la fecha en la que el profesor comenzó a dar la materia)
-
-## Swagger / Open-API
-
-El proyecto viene con las dependencias de Swagger2 por lo tanto podés testearlo directamente en el navegador cuando levantes la aplicación en la siguiente URL:
-
-```url
-http://localhost:8080/swagger-ui/index.html#
-```
 
 ## Endpoints comunes
 
@@ -175,12 +166,17 @@ El mismo mecanismo de bootstrap que crea los profesores para levantar la aplicac
 ```kotlin
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+// @ActiveProfiles("test")
 @DisplayName("Dado un controller de profesores")
 class ProfesorControllerTest {
 ```
 
-La anotación ActiveProfiles que contiene el valor `test` por convención nos permite definir en un archivo `application-test.yml` la conexión a la base en memoria:
+Para cambiar la configuración en test tenemos dos opciones:
+
+- descomentar la anotación ActiveProfiles y generar un archivo `application-test.yml` (el nombre test debe coincidir con el nombre que le pasás a la configuración)
+- otra opción más simple que no necesita la anotación es ubicar un archivo de configuración `application.yml` diferente, en la carpeta `src/test/resources` 
+
+La conexión a la base en memoria:
 
 ```yml
 spring:
@@ -190,13 +186,11 @@ spring:
       path: /h2
 
   datasource:
-    url: jdbc:h2:mem:test
+    url: jdbc:h2:mem:mydb
     username: sa
     password: sa
-    driver-class-name: org.h2.Driver
+    driverClassName: org.h2.Driver
 ```
-
-En general el nombre es `application-XXX.yml` donde XXX será el valor que le pasaremos a la anotación ActiveProfiles.
 
 ### Tipos de tests de Springboot
 
