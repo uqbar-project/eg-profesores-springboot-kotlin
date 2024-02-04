@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 @DisplayName("Dado un controller de profesores")
 class ProfesorControllerTest {
     private val mapper = jacksonObjectMapper()
@@ -37,6 +35,8 @@ class ProfesorControllerTest {
 
     @Test
     fun `al consultar todos los profesores no sabemos las materias en las que participa`() {
+        crearProfesorConMaterias()
+
         val responseEntity = mockMvc
             .perform(MockMvcRequestBuilders.get("/profesores"))
             .andReturn().response

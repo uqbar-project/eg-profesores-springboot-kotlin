@@ -14,9 +14,11 @@ class MateriaController {
 
     @GetMapping("")
     @Operation(summary = "Devuelve todas las materias")
-    fun getMaterias() = materiaService.getMaterias().toList()
+    fun getMaterias() =
+        materiaService.getMaterias().toList()
 
     @GetMapping("/{id}")
     @Operation(summary = "Devuelve una materia, con sus profesores")
-    fun getMateria(@PathVariable id: Long) = materiaService.getMateria(id)
+    fun getMateria(@PathVariable id: Long) =
+        materiaService.getMateria(id)
 }
