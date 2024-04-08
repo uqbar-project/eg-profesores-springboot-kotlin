@@ -195,15 +195,15 @@ spring:
 ### Tipos de tests de Springboot
 
 Las variantes que tenemos a la hora de definir tests en Springboot son:
-- `@DataJpaTest`: útil si queremos hacer el test de integración únicamente contra el repositorio (en el ejemplo nosotros queremos testear la integración del controller con el repositorio). Esto automáticamente configura la base H2 en memoria, sin necesidad de que lo hagamos nosotros manualmente.
-- `@WebMvcTest`: sirven para hacer test de integración de los endpoints, porque levantan un entorno de prueba más rápido que el web server. El tema es que si queremos trabajar con repositorios, debemos usar la anotación `@MockBean` que nos permite generar un _mock_ del mismo. Entonces la prueba que estamos haciendo no es completa.
+- `@DataJpaTest`: útil si queremos hacer el test de integración únicamente contra el repositorio (en el ejemplo nosotros queremos testear cómo se comporta el repositorio cuando pedimos una materia con dos profesores o sin profesores). Esto automáticamente configura la base H2 en memoria, sin necesidad de que lo hagamos nosotros manualmente.
+- `@WebMvcTest`: sirven para hacer test de integración de los endpoints, porque levantan un entorno de prueba más rápido que el web server. Las dependencias se anotan con `@MockBean` lo que les genera un _mock_ automáticamente. Entonces la prueba que estamos haciendo no es completa.
 - `@SpringBootTest`: es el que nos permite generar un entorno de prueba completo, donde no se mockee repositorios ni ningún otro componente, y por lo tanto es el que utilizamos en este caso.
 
 Para más información recomendamos leer [el artículo de Springboot de Baeldung](https://www.baeldung.com/spring-boot-testing)
 
 ### Prueba de integración a nivel repositorio
 
-Para mostrar un ejemplo de tests de integración a nivel repositorio con la anotación `@DataJpaTest`, vamos a implementar tests contra la consulta que trae una materia con la lista de profesores. Esta tiene una definición específica, ya que testear los queries que vienen con los repositorios de Springboot no tiene mucho sentido.
+Para mostrar cómo implementar tests de integración a nivel repositorio con la anotación `@DataJpaTest`, usaremos como ejemplo la consulta que trae una materia con la lista de profesores, es decir el método findFullById que tiene un query particular (no es el estándar que genera Springboot).
 
 Tomemos entonces el caso de una materia que tiene dos profesores, debería devolver 2 filas, que representa el producto cartesiano MxP (Materia x Profesor):
 
