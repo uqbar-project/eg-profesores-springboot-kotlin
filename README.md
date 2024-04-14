@@ -94,16 +94,7 @@ fun findFullById(id: Long): List<MateriaFullRowDTO>
 
 El resultado de esa consulta son n registros, porque es el producto cartesiano de 1 materia con n profesores.
 
-El DTO es una interfaz, donde por convención los atributos se corresponden con el alias que le pusimos en el query:
-
-```kotlin
-data class MateriaDTO(val id: Long, 
-                      val nombre: String, 
-                      val anio: Int, 
-                      val profesores: List<ProfesorDTO>)
-```
-
-Podemos mapear el atributo de nuestro DTO con otro nombre, mediante la anotación `@Value`:
+El DTO es una interfaz, donde por convención los getters se corresponden con el alias que le pusimos en el query, y podemos mapear el atributo de nuestro DTO con otro nombre, mediante la anotación `@Value`:
 
 ```kotlin
 interface MateriaFullRowDTO {
