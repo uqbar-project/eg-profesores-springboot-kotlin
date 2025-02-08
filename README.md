@@ -39,7 +39,11 @@ Un profesor dicta una o varias materias, y a su vez cada materia es dictada por 
 - `GET /materias/`: devuelve la lista de materias
 - `PUT /profesores/{id}`: actualiza un profesor con los datos del body
 
-Se puede importar el archivo [Insomnia_Profesores.json](Insomnia_Profesores.json) en Insomnia, para tenerlos a mano.
+Se puede importar el archivo con las colecciones para cada cliente web:
+
+- [Bruno](Profesores_Bruno.json)
+- [Insomnia](Profesores_Insomnia.json)
+- [Postman](Profesores_Postman.json)
 
 ## Endpoint especial
 

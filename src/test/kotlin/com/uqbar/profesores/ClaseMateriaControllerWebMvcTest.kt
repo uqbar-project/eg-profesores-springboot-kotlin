@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -16,21 +16,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @WebMvcTest(controllers = [MateriaController::class])
 open class ClaseMateriaControllerWebMvcTest {
 
-    @MockBean
+    @MockitoBean
     lateinit var materiaService: MateriaService
 
     @Autowired
     lateinit var mockMvc: MockMvc
 
     @Test
-    open fun `al pedir info de una materia que no existe devuelve 404`() {
-        val idMateria = 1L
+    open fun `al pedir info de una materia que no existe, debe devolver 404`() {
+        Mockito.`when`(materiaService.getMateria(1)).thenAnswer { throw NotFoundException("Materia no existe") }
 
-        Mockito.`when`(materiaService.getMateria(idMateria))
-            .thenAnswer { throw NotFoundException("Materia no existe") }
-
-        mockMvc.perform(get("/materias/${idMateria}"))
-            .andExpect(status().isNotFound)
+        mockMvc.perform(get("/materias/1")).andExpect(status().isNotFound)
     }
 }
 

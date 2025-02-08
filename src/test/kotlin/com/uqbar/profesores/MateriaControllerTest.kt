@@ -56,5 +56,15 @@ class MateriaControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.profesores").isArray)
     }
 
+    @Test
+    fun `al buscar la info de una materia que no tiene profes, trae una lista vacía de profes pero viene la materia`() {
+        val materiaSinProfesores = repoMaterias.save(Materia(nombre = "Geometría Analítica", anio = 1))
 
+        mockMvc.perform(MockMvcRequestBuilders.get("/materias/${materiaSinProfesores.id}"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nombre").value(materiaSinProfesores.nombre))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(materiaSinProfesores.id))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.anio").value(materiaSinProfesores.anio))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.profesores").isEmpty)
+    }
 }

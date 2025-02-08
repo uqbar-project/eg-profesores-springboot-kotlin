@@ -32,15 +32,14 @@ class ClaseMateriaRepositoryTest {
         assertTrue(materias.isEmpty())
     }
 
-
     @Test
     fun `al buscar una materia con profes hace un producto cartesiano entre materias y profes`() {
         // Arrange
         val materia = materiaRepository.save(Materia(nombre = "PHM", anio = 3))
-        profesorRepository.save(Profesor(nombreCompleto = "Fer Dodino").apply {
+        profesorRepository.save(Profesor(nombreCompleto = "Dodain").apply {
             agregarMateria(materia)
         })
-        profesorRepository.save(Profesor(nombreCompleto = "Juan Contardo").apply {
+        profesorRepository.save(Profesor(nombreCompleto = "Juan").apply {
             agregarMateria(materia)
         })
 
@@ -49,6 +48,10 @@ class ClaseMateriaRepositoryTest {
 
         // Assert
         assertEquals(2, filas.size)
+        assertEquals(filas[0].getNombreLindo(), "PHM")
+        assertEquals(filas[0].getProfesorNombre(), "Dodain")
     }
+
+
 
 }
