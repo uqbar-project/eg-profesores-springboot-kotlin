@@ -3,137 +3,131 @@
   "version": "1",
   "items": [
     {
-      "type": "folder",
-      "name": "Profesores y alumnos",
-      "items": [
-        {
-          "type": "http",
-          "name": "Profesores - Actualizar uno",
-          "seq": 8,
-          "request": {
-            "url": "http://localhost:8080/profesores/3",
-            "method": "PUT",
-            "headers": [
-              {
-                "name": "Content-Type",
-                "value": "application/json",
-                "enabled": true
-              }
-            ],
-            "params": [],
-            "body": {
-              "mode": "json",
-              "json": "{\n  \"id\": 3,\n  \"nombreCompleto\": \"Fernando E. Dodino\"\n}",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "",
-            "docs": "",
-            "auth": {
-              "mode": "none"
-            }
-          }
+      "type": "http",
+      "name": "Ver Materia",
+      "seq": 1,
+      "request": {
+        "url": "http://localhost:8080/materias/2",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
         },
-        {
-          "type": "http",
-          "name": "Profesores - Ver datos de un profesor",
-          "seq": 9,
-          "request": {
-            "url": "http://localhost:8080/profesores/3",
-            "method": "GET",
-            "headers": [],
-            "params": [],
-            "body": {
-              "mode": "none",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "",
-            "docs": "",
-            "auth": {
-              "mode": "none"
-            }
-          }
-        },
-        {
-          "type": "http",
-          "name": "Profesores - Ver todos",
-          "seq": 10,
-          "request": {
-            "url": "http://localhost:8080/profesores",
-            "method": "GET",
-            "headers": [],
-            "params": [],
-            "body": {
-              "mode": "none",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "",
-            "docs": "",
-            "auth": {
-              "mode": "none"
-            }
-          }
-        },
-        {
-          "type": "http",
-          "name": "Ver Materia",
-          "seq": 6,
-          "request": {
-            "url": "http://localhost:8080/materias/2",
-            "method": "GET",
-            "headers": [],
-            "params": [],
-            "body": {
-              "mode": "none",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "",
-            "docs": "",
-            "auth": {
-              "mode": "none"
-            }
-          }
-        },
-        {
-          "type": "http",
-          "name": "Ver todas las materias",
-          "seq": 7,
-          "request": {
-            "url": "http://localhost:8080/materias",
-            "method": "GET",
-            "headers": [],
-            "params": [],
-            "body": {
-              "mode": "none",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "",
-            "docs": "",
-            "auth": {
-              "mode": "none"
-            }
-          }
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
         }
-      ]
+      }
+    },
+    {
+      "type": "http",
+      "name": "Ver todas las materias",
+      "seq": 2,
+      "request": {
+        "url": "http://localhost:8080/materias",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Profesores - Actualizar uno",
+      "seq": 3,
+      "request": {
+        "url": "http://localhost:8080/profesores/3",
+        "method": "PUT",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"id\": 3,\n  \"nombreCompleto\": \"Fernando E. Dodino\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Profesores - Ver datos de un profesor",
+      "seq": 4,
+      "request": {
+        "url": "http://localhost:8080/profesores/3",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Profesores - Ver todos",
+      "seq": 5,
+      "request": {
+        "url": "http://localhost:8080/profesores",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
     }
   ],
   "environments": [],

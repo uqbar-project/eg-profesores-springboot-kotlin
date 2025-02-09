@@ -6,142 +6,137 @@
   },
   "item": [
     {
-      "name": "bruno",
-      "event": []
-    },
-    {
-      "name": "Profesores y alumnos",
-      "item": [
-        {
-          "name": "Profesores - Actualizar uno",
-          "event": [],
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "disabled": false,
-                "type": "default"
-              }
-            ],
-            "auth": null,
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8080/profesores/3",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "profesores",
-                "3"
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n\t\"id\": 3,\n\t\"nombreCompleto\": \"Fernando E. Dodino\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
+      "name": "Profesores - Actualizar uno",
+      "event": [],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "disabled": false,
+            "type": "default"
           }
+        ],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/profesores/3",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "profesores",
+            "3"
+          ],
+          "query": [],
+          "variable": []
         },
-        {
-          "name": "Profesores - Ver datos de un profesor",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": null,
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8080/profesores/3",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "profesores",
-                "3"
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Profesores - Ver todos",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": null,
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8080/profesores",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "profesores"
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Ver Materia",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": null,
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8080/materias/2",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "materias",
-                "2"
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Ver todas las materias",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": null,
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8080/materias",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "materias"
-              ],
-              "query": [],
-              "variable": []
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 3,\n  \"nombreCompleto\": \"Fernando E. Dodino\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
             }
           }
         }
-      ]
+      }
+    },
+    {
+      "name": "Profesores - Ver datos de un profesor",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/profesores/3",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "profesores",
+            "3"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Profesores - Ver todos",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/profesores",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "profesores"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Ver Materia",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/materias/2",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "materias",
+            "2"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Ver todas las materias",
+      "event": [],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": null,
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/materias",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "materias"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "bruno",
+      "event": []
     }
   ],
   "variable": []
