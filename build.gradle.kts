@@ -1,9 +1,9 @@
 plugins {
 	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
-	kotlin("jvm") version "2.2.10"
-	kotlin("plugin.spring") version "2.2.10"
-	kotlin("plugin.jpa") version "2.2.10"
+	kotlin("jvm") version "2.3.0"
+	kotlin("plugin.spring") version "2.3.0"
+	kotlin("plugin.jpa") version "2.3.0"
 	jacoco
 }
 
@@ -12,13 +12,13 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
 tasks.withType<JavaCompile> {
-    targetCompatibility = "25"
-    sourceCompatibility = "25"
+    targetCompatibility = "21"
+    sourceCompatibility = "21"
 }
 
 repositories {
