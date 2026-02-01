@@ -12,13 +12,13 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
 tasks.withType<JavaCompile> {
-    targetCompatibility = "21"
-    sourceCompatibility = "21"
+    targetCompatibility = "25"
+    sourceCompatibility = "25"
 }
 
 repositories {
