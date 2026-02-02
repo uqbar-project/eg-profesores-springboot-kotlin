@@ -43,8 +43,6 @@ dependencies {
 	// testing
 	testImplementation("com.h2database:h2:2.4.240")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
-    testImplementation("jakarta.servlet:jakarta.servlet-api:6.1.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
