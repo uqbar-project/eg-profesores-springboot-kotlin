@@ -16,11 +16,6 @@ java {
 	}
 }
 
-tasks.withType<JavaCompile> {
-    targetCompatibility = "21"
-    sourceCompatibility = "21"
-}
-
 repositories {
 	mavenCentral()
 }
@@ -54,6 +49,11 @@ kotlin {
             "-Xjsr305=strict",
         )
     }
+}
+
+tasks.withType<JavaCompile> {
+    targetCompatibility = "21"
+    sourceCompatibility = "21"
 }
 
 tasks.withType<Test> {
